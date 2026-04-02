@@ -126,36 +126,72 @@ export const GET_CATEGORY_WITH_PRODUCTS = /* GraphQL */ `
   ${CATEGORY_DETAILS_FRAGMENT}
 `
 
+/**
+ * Get Navigation Menu using categoryList
+ * Uses the root category ID (default: 2) to fetch the category tree
+ */
 export const GET_NAVIGATION_MENU = /* GraphQL */ `
-  query GetNavigationMenu {
-    categories(filters: { parent_id: { eq: "2" } }) {
-      items {
+  query CategoryTreeView($rootCategoryId: String = "2") {
+    categoryList(filters: { ids: { eq: $rootCategoryId } }) {
+      id
+      name
+      url_key
+      url_path
+      position
+      children_count
+      children {
         id
-        uid
         name
         url_key
         url_path
         position
-        include_in_menu
         children_count
         children {
           id
-          uid
           name
           url_key
           url_path
           position
-          include_in_menu
           children_count
-          children {
-            id
-            uid
-            name
-            url_key
-            url_path
-            position
-            include_in_menu
-          }
+        }
+      }
+    }
+  }
+`
+
+/**
+ * Get Category Tree using categoryList
+ */
+export const GET_CATEGORY_LIST_TREE = /* GraphQL */ `
+  query GetCategoryListTree($categoryId: String = "2") {
+    categoryList(filters: { ids: { eq: $categoryId } }) {
+      id
+      name
+      url_key
+      url_path
+      position
+      level
+      description
+      image
+      children_count
+      children {
+        id
+        name
+        url_key
+        url_path
+        position
+        level
+        description
+        image
+        children_count
+        children {
+          id
+          name
+          url_key
+          url_path
+          position
+          level
+          children_count
         }
       }
     }

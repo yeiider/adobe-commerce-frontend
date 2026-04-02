@@ -12,7 +12,7 @@ import {
   GET_CATEGORY_WITH_PRODUCTS,
   GET_NAVIGATION_MENU,
 } from '@/src/lib/graphql/queries/category.queries'
-import { Category, NavigationItem, CategoryTreeResponse } from '@/src/types/category.types'
+import { Category, NavigationItem, CategoryTreeResponse, CategoryListResponse } from '@/src/types/category.types'
 import { ProductsResponse } from '@/src/types/product.types'
 import { config } from '@/src/config/env'
 
@@ -119,38 +119,39 @@ export async function getCategoryWithProducts(
 }
 
 /**
- * Get navigation menu
+ * Get navigation menu using Magento's categoryList query
+ * @param rootCategoryId - The root category ID (default: "2" for Default Category)
  */
-export async function getNavigationMenu(): Promise<NavigationItem[] | null> {
+export async function getNavigationMenu(rootCategoryId: string = "2"): Promise<NavigationItem[] | null> {
   try {
-    console.log('[v0] Fetching navigation menu...')
-    
-    const { data, errors } = await graphqlClient<{
-      categories: { items: NavigationItem[] }
-    }>({
+    const { data, errors } = await graphqlClient<CategoryListResponse>({
       query: GET_NAVIGATION_MENU,
+      variables: { rootCategoryId },
       revalidate: config.cache.revalidateTime,
     })
 
     if (errors) {
-      console.error('[v0] Navigation menu errors:', errors)
+      console.error('[CategoryService] Navigation menu errors:', errors)
       return null
     }
     
-    if (!data?.categories?.items) {
-      console.log('[v0] No categories found in response')
+    // categoryList returns an array directly, not nested in items
+    if (!data?.categoryList?.length) {
+      console.error('[CategoryService] No categories found in response')
       return null
     }
 
-    console.log('[v0] Navigation items fetched:', data.categories.items.length)
+    // The root category (Default Category) contains the children we need for navigation
+    const rootCategory = data.categoryList[0]
     
-    // Filter only items that should be in menu
-    const menuItems = data.categories.items.filter((item) => item.include_in_menu)
-    console.log('[v0] Menu items after filter:', menuItems.length)
-    
-    return menuItems
+    if (!rootCategory?.children) {
+      return []
+    }
+
+    // Return the children of the root category (these are the main nav items)
+    return rootCategory.children
   } catch (error) {
-    console.error('[v0] Error fetching navigation menu:', error)
+    console.error('[CategoryService] Error fetching navigation menu:', error)
     return null
   }
 }
