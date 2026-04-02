@@ -3,7 +3,7 @@
  * Handles all GraphQL requests with proper headers and error handling
  */
 
-import { config } from '@/config/env'
+import { config } from '@/src/config/env'
 
 export interface GraphQLResponse<T> {
   data?: T
@@ -67,16 +67,27 @@ export async function graphqlClient<T>(
   }
 
   try {
-    const response = await fetch(config.adobe.graphqlEndpoint, fetchOptions)
+    const endpoint = config.adobe.graphqlEndpoint
+    console.log('[v0] GraphQL Request to:', endpoint)
+    console.log('[v0] Query:', query.substring(0, 100) + '...')
+    
+    const response = await fetch(endpoint, fetchOptions)
 
     if (!response.ok) {
+      console.error('[v0] HTTP Error:', response.status, response.statusText)
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const json = await response.json()
+    console.log('[v0] GraphQL Response received:', json.data ? 'with data' : 'no data')
+    
+    if (json.errors) {
+      console.error('[v0] GraphQL Errors:', JSON.stringify(json.errors, null, 2))
+    }
+    
     return json as GraphQLResponse<T>
   } catch (error) {
-    console.error('[GraphQL Client Error]:', error)
+    console.error('[v0] GraphQL Client Error:', error)
     throw error
   }
 }

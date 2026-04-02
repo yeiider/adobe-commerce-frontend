@@ -17,8 +17,8 @@ import {
   getStoredCartId,
   storeCartId,
   clearStoredCartId,
-} from '@/services/cart.service'
-import { Cart, CartItemInput, CartItemUpdateInput } from '@/types/cart.types'
+} from '@/src/services/cart.service'
+import { Cart, CartItemInput, CartItemUpdateInput } from '@/src/types/cart.types'
 import { useCallback, useEffect, useState } from 'react'
 
 const CART_KEY = 'adobe-commerce-cart'

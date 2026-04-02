@@ -3,10 +3,10 @@
  * Business logic for CMS content operations
  */
 
-import { graphqlClient } from '@/lib/graphql/client'
-import { GET_CMS_PAGE, GET_CMS_BLOCKS } from '@/lib/graphql/queries/cms.queries'
-import { CmsPage, CmsBlock, CmsBlocksResponse, CmsPageResponse } from '@/types/cms.types'
-import { config } from '@/config/env'
+import { graphqlClient } from '@/src/lib/graphql/client'
+import { GET_CMS_PAGE, GET_CMS_BLOCKS } from '@/src/lib/graphql/queries/cms.queries'
+import { CmsPage, CmsBlock, CmsBlocksResponse, CmsPageResponse } from '@/src/types/cms.types'
+import { config } from '@/src/config/env'
 
 /**
  * Get CMS page by identifier

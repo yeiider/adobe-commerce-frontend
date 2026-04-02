@@ -16,8 +16,8 @@ import {
   storeCustomerToken,
   getStoredCustomerToken,
   clearStoredCustomerToken,
-} from '@/services/customer.service'
-import { Customer, CustomerCreateInput, CustomerUpdateInput } from '@/types/customer.types'
+} from '@/src/services/customer.service'
+import { Customer, CustomerCreateInput, CustomerUpdateInput } from '@/src/types/customer.types'
 
 const CUSTOMER_KEY = 'adobe-commerce-customer'
 

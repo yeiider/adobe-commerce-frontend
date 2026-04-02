@@ -3,14 +3,14 @@
  * Business logic for cart operations
  */
 
-import { graphqlClient } from '@/lib/graphql/client'
+import { graphqlClient } from '@/src/lib/graphql/client'
 import {
   GET_CART,
   GET_CART_ITEMS,
   GET_CART_TOTALS,
   GET_CART_SHIPPING_METHODS,
   GET_CART_PAYMENT_METHODS,
-} from '@/lib/graphql/queries/cart.queries'
+} from '@/src/lib/graphql/queries/cart.queries'
 import {
   CREATE_EMPTY_CART,
   ADD_PRODUCTS_TO_CART,
@@ -20,7 +20,7 @@ import {
   REMOVE_COUPON_FROM_CART,
   MERGE_CARTS,
   SET_GUEST_EMAIL_ON_CART,
-} from '@/lib/graphql/mutations/cart.mutations'
+} from '@/src/lib/graphql/mutations/cart.mutations'
 import {
   Cart,
   CartItem,
@@ -29,8 +29,8 @@ import {
   AddToCartResponse,
   UpdateCartResponse,
   RemoveFromCartResponse,
-} from '@/types/cart.types'
-import { config } from '@/config/env'
+} from '@/src/types/cart.types'
+import { config } from '@/src/config/env'
 
 /**
  * Create an empty cart

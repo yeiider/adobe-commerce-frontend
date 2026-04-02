@@ -3,7 +3,7 @@
  * Business logic for category operations
  */
 
-import { graphqlClient } from '@/lib/graphql/client'
+import { graphqlClient } from '@/src/lib/graphql/client'
 import {
   GET_CATEGORY_TREE,
   GET_CATEGORY_BY_URL_KEY,
@@ -11,10 +11,10 @@ import {
   GET_CATEGORY_BY_ID,
   GET_CATEGORY_WITH_PRODUCTS,
   GET_NAVIGATION_MENU,
-} from '@/lib/graphql/queries/category.queries'
-import { Category, NavigationItem, CategoryTreeResponse } from '@/types/category.types'
-import { ProductsResponse } from '@/types/product.types'
-import { config } from '@/config/env'
+} from '@/src/lib/graphql/queries/category.queries'
+import { Category, NavigationItem, CategoryTreeResponse } from '@/src/types/category.types'
+import { ProductsResponse } from '@/src/types/product.types'
+import { config } from '@/src/config/env'
 
 export interface GetCategoryWithProductsOptions {
   urlPath: string
@@ -122,17 +122,35 @@ export async function getCategoryWithProducts(
  * Get navigation menu
  */
 export async function getNavigationMenu(): Promise<NavigationItem[] | null> {
-  const { data, errors } = await graphqlClient<{
-    categories: { items: NavigationItem[] }
-  }>({
-    query: GET_NAVIGATION_MENU,
-    revalidate: config.cache.revalidateTime,
-  })
+  try {
+    console.log('[v0] Fetching navigation menu...')
+    
+    const { data, errors } = await graphqlClient<{
+      categories: { items: NavigationItem[] }
+    }>({
+      query: GET_NAVIGATION_MENU,
+      revalidate: config.cache.revalidateTime,
+    })
 
-  if (errors || !data?.categories?.items) {
+    if (errors) {
+      console.error('[v0] Navigation menu errors:', errors)
+      return null
+    }
+    
+    if (!data?.categories?.items) {
+      console.log('[v0] No categories found in response')
+      return null
+    }
+
+    console.log('[v0] Navigation items fetched:', data.categories.items.length)
+    
+    // Filter only items that should be in menu
+    const menuItems = data.categories.items.filter((item) => item.include_in_menu)
+    console.log('[v0] Menu items after filter:', menuItems.length)
+    
+    return menuItems
+  } catch (error) {
+    console.error('[v0] Error fetching navigation menu:', error)
     return null
   }
-
-  // Filter only items that should be in menu
-  return data.categories.items.filter((item) => item.include_in_menu)
 }

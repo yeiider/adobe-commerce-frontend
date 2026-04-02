@@ -3,12 +3,12 @@
  * Business logic for store configuration operations
  */
 
-import { graphqlClient } from '@/lib/graphql/client'
+import { graphqlClient } from '@/src/lib/graphql/client'
 import {
   GET_STORE_CONFIG,
   GET_AVAILABLE_STORES,
   GET_CURRENCY,
-} from '@/lib/graphql/queries/store.queries'
+} from '@/src/lib/graphql/queries/store.queries'
 import {
   StoreConfig,
   AvailableStore,
@@ -16,8 +16,8 @@ import {
   StoreConfigResponse,
   AvailableStoresResponse,
   CurrencyResponse,
-} from '@/types/store.types'
-import { config } from '@/config/env'
+} from '@/src/types/store.types'
+import { config } from '@/src/config/env'
 
 /**
  * Get store configuration

@@ -3,7 +3,7 @@
  * Business logic for customer operations
  */
 
-import { graphqlClient } from '@/lib/graphql/client'
+import { graphqlClient } from '@/src/lib/graphql/client'
 import {
   GET_CUSTOMER,
   GET_CUSTOMER_ADDRESSES,
@@ -11,7 +11,7 @@ import {
   GET_CUSTOMER_ORDER,
   GET_CUSTOMER_WISHLISTS,
   IS_EMAIL_AVAILABLE,
-} from '@/lib/graphql/queries/customer.queries'
+} from '@/src/lib/graphql/queries/customer.queries'
 import {
   CREATE_CUSTOMER,
   GENERATE_CUSTOMER_TOKEN,
@@ -24,7 +24,7 @@ import {
   UPDATE_CUSTOMER_ADDRESS,
   DELETE_CUSTOMER_ADDRESS,
   SUBSCRIBE_EMAIL_TO_NEWSLETTER,
-} from '@/lib/graphql/mutations/customer.mutations'
+} from '@/src/lib/graphql/mutations/customer.mutations'
 import {
   Customer,
   CustomerAddress,
@@ -34,8 +34,8 @@ import {
   CustomerOrdersResponse,
   Wishlist,
   CustomerToken,
-} from '@/types/customer.types'
-import { config } from '@/config/env'
+} from '@/src/types/customer.types'
+import { config } from '@/src/config/env'
 
 /**
  * Create a new customer

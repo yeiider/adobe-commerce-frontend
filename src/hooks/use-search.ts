@@ -7,8 +7,8 @@
 
 import useSWR from 'swr'
 import { useState, useCallback, useMemo } from 'react'
-import { searchProducts, getSearchSuggestions, SearchOptions } from '@/services/search.service'
-import { ProductsResponse, Product, SearchSuggestion } from '@/types/product.types'
+import { searchProducts, getSearchSuggestions, SearchOptions } from '@/src/services/search.service'
+import { ProductsResponse, Product, SearchSuggestion } from '@/src/types/product.types'
 import { useDebouncedValue } from './use-debounced-value'
 
 const SEARCH_KEY = 'adobe-commerce-search'

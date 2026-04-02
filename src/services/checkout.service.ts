@@ -3,15 +3,15 @@
  * Business logic for checkout operations
  */
 
-import { graphqlClient } from '@/lib/graphql/client'
-import { GET_COUNTRIES, GET_COUNTRY } from '@/lib/graphql/queries/checkout.queries'
+import { graphqlClient } from '@/src/lib/graphql/client'
+import { GET_COUNTRIES, GET_COUNTRY } from '@/src/lib/graphql/queries/checkout.queries'
 import {
   SET_SHIPPING_ADDRESSES_ON_CART,
   SET_BILLING_ADDRESS_ON_CART,
   SET_SHIPPING_METHODS_ON_CART,
   SET_PAYMENT_METHOD_ON_CART,
   PLACE_ORDER,
-} from '@/lib/graphql/mutations/checkout.mutations'
+} from '@/src/lib/graphql/mutations/checkout.mutations'
 import {
   Country,
   ShippingAddressInput,
@@ -20,9 +20,9 @@ import {
   PaymentMethodInput,
   Order,
   PlaceOrderResponse,
-} from '@/types/checkout.types'
-import { ShippingAddress } from '@/types/cart.types'
-import { config } from '@/config/env'
+} from '@/src/types/checkout.types'
+import { ShippingAddress } from '@/src/types/cart.types'
+import { config } from '@/src/config/env'
 
 /**
  * Get all countries

@@ -3,16 +3,16 @@
  * Business logic for product operations
  */
 
-import { graphqlClient } from '@/lib/graphql/client'
+import { graphqlClient } from '@/src/lib/graphql/client'
 import {
   GET_PRODUCT_BY_URL_KEY,
   GET_PRODUCT_BY_SKU,
   GET_PRODUCTS_BY_CATEGORY,
   GET_PRODUCTS_BY_FILTER,
   GET_PRODUCT_REVIEWS,
-} from '@/lib/graphql/queries/product.queries'
-import { Product, ProductsResponse, ProductReviews } from '@/types/product.types'
-import { config } from '@/config/env'
+} from '@/src/lib/graphql/queries/product.queries'
+import { Product, ProductsResponse, ProductReviews } from '@/src/types/product.types'
+import { config } from '@/src/config/env'
 
 export interface GetProductsOptions {
   categoryUid?: string

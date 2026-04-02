@@ -10,8 +10,8 @@ import {
   getStoreConfig,
   getAvailableStores,
   getCurrency,
-} from '@/services/store.service'
-import { StoreConfig, AvailableStore, Currency } from '@/types/store.types'
+} from '@/src/services/store.service'
+import { StoreConfig, AvailableStore, Currency } from '@/src/types/store.types'
 
 const STORE_CONFIG_KEY = 'adobe-commerce-store-config'
 const AVAILABLE_STORES_KEY = 'adobe-commerce-available-stores'

@@ -3,8 +3,8 @@
  * Formatting functions for prices, dates, etc.
  */
 
-import { Money } from '@/types/common.types'
-import { config } from '@/config/env'
+import { Money } from '@/src/types/common.types'
+import { config } from '@/src/config/env'
 
 /**
  * Format price with currency

@@ -7,13 +7,13 @@
 
 import useSWR from 'swr'
 import { useCallback } from 'react'
-import { graphqlClient } from '@/lib/graphql/client'
-import { getCustomerWishlists } from '@/services/customer.service'
+import { graphqlClient } from '@/src/lib/graphql/client'
+import { getCustomerWishlists } from '@/src/services/customer.service'
 import {
   ADD_PRODUCTS_TO_WISHLIST,
   REMOVE_PRODUCTS_FROM_WISHLIST,
-} from '@/lib/graphql/mutations/wishlist.mutations'
-import { Wishlist } from '@/types/customer.types'
+} from '@/src/lib/graphql/mutations/wishlist.mutations'
+import { Wishlist } from '@/src/types/customer.types'
 import { useCustomer } from './use-customer'
 
 const WISHLIST_KEY = 'adobe-commerce-wishlist'

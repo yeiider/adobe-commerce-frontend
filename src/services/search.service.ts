@@ -3,10 +3,10 @@
  * Business logic for search operations
  */
 
-import { graphqlClient } from '@/lib/graphql/client'
-import { SEARCH_PRODUCTS, GET_SEARCH_SUGGESTIONS } from '@/lib/graphql/queries/search.queries'
-import { ProductsResponse, SearchSuggestion, Product } from '@/types/product.types'
-import { config } from '@/config/env'
+import { graphqlClient } from '@/src/lib/graphql/client'
+import { SEARCH_PRODUCTS, GET_SEARCH_SUGGESTIONS } from '@/src/lib/graphql/queries/search.queries'
+import { ProductsResponse, SearchSuggestion, Product } from '@/src/types/product.types'
+import { config } from '@/src/config/env'
 
 export interface SearchOptions {
   search: string
