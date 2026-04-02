@@ -14,6 +14,7 @@ import type { StoreConfig, Currency } from '@/src/types/store.types'
 export interface StoreContextType {
   storeConfig: StoreConfig | null
   currency: Currency | null
+  rootCategoryId: string
   // Derived helpers
   formatPrice: (price: number, currencyCode?: string) => string
   getMediaUrl: (path: string) => string
@@ -27,6 +28,7 @@ export interface StoreContextType {
 const defaultContext: StoreContextType = {
   storeConfig: null,
   currency: null,
+  rootCategoryId: '2',
   formatPrice: (price: number) => `$${price.toFixed(2)}`,
   getMediaUrl: (path: string) => path,
   getCategoryUrl: (urlPath: string) => `/${urlPath}`,
@@ -42,13 +44,16 @@ interface StoreProviderProps {
   children: ReactNode
   storeConfig: StoreConfig | null
   currency: Currency | null
+  rootCategoryId?: string
 }
 
 /**
  * Store Provider Component
  * Wraps the application with store context
  */
-export function StoreProvider({ children, storeConfig, currency }: StoreProviderProps) {
+export function StoreProvider({ children, storeConfig, currency, rootCategoryId }: StoreProviderProps) {
+  // Derive rootCategoryId from storeConfig if not provided
+  const effectiveRootCategoryId = rootCategoryId || storeConfig?.root_category_id?.toString() || '2'
   /**
    * Format price with currency symbol
    */
@@ -110,6 +115,7 @@ export function StoreProvider({ children, storeConfig, currency }: StoreProvider
   const value: StoreContextType = {
     storeConfig,
     currency,
+    rootCategoryId: effectiveRootCategoryId,
     formatPrice,
     getMediaUrl,
     getCategoryUrl,
@@ -155,4 +161,11 @@ export function useCurrency(): Currency | null {
  */
 export function usePriceFormatter(): (price: number, currencyCode?: string) => string {
   return useStore().formatPrice
+}
+
+/**
+ * Hook to get root category ID
+ */
+export function useRootCategoryId(): string {
+  return useStore().rootCategoryId
 }

@@ -12,5 +12,6 @@ export {
   useStoreConfig, 
   useCurrency, 
   usePriceFormatter,
+  useRootCategoryId,
   type StoreContextType 
 } from './StoreProvider'

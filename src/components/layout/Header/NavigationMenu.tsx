@@ -22,8 +22,8 @@ export function NavigationMenu({ items }: NavigationMenuProps) {
   return (
     <nav className="flex items-center" role="navigation" aria-label="Navegación principal">
       <ul className="flex items-center gap-1">
-        {items.map((item) => (
-          <NavItem key={item.url_path || item.name} item={item} />
+        {items.map((item, index) => (
+          <NavItem key={`nav-${item.url_path || item.name}-${index}`} item={item} />
         ))}
       </ul>
     </nav>
@@ -88,8 +88,8 @@ function NavItem({ item }: NavItemProps) {
         >
           <div className="mt-2 rounded-lg border border-border bg-background p-2 shadow-lg">
             <ul className="space-y-1">
-              {item.children?.map((child) => (
-                <DropdownItem key={child.url_path || child.name} item={child} />
+              {item.children?.map((child, index) => (
+                <DropdownItem key={`dropdown-${child.url_path || child.name}-${index}`} item={child} />
               ))}
             </ul>
 
@@ -148,8 +148,8 @@ function DropdownItem({ item }: DropdownItemProps) {
         >
           <div className="ml-2 rounded-lg border border-border bg-background p-2 shadow-lg">
             <ul className="space-y-1">
-              {item.children?.map((child) => (
-                <li key={child.url_path || child.name}>
+              {item.children?.map((child, index) => (
+                <li key={`nested-${child.url_path || child.name}-${index}`}>
                   <Link
                     href={child.url_path ? `/${child.url_path}` : '#'}
                     className="block rounded-md px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"

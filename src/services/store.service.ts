@@ -105,11 +105,13 @@ export async function getAvailableStores(): Promise<AvailableStore[] | null> {
 export interface StoreContext {
   storeConfig: StoreConfig | null
   currency: Currency | null
+  rootCategoryId: string
 }
 
 /**
  * Get all store context data in parallel
  * Optimized for initial page load
+ * Returns rootCategoryId derived from storeConfig for navigation
  */
 export async function getStoreContext(): Promise<StoreContext> {
   const [storeConfig, currency] = await Promise.all([
@@ -117,8 +119,38 @@ export async function getStoreContext(): Promise<StoreContext> {
     getCurrencyConfig(),
   ])
 
+  // Extract root category ID from store config, default to "2" (Magento default)
+  const rootCategoryId = storeConfig?.root_category_id?.toString() || '2'
+
   return {
     storeConfig,
     currency,
+    rootCategoryId,
+  }
+}
+
+/**
+ * Full Store Context with Navigation
+ * Complete data needed for storefront layout
+ */
+export interface FullStoreContext extends StoreContext {
+  navigation: import('@/src/types/category.types').NavigationItem[] | null
+}
+
+/**
+ * Get full store context including navigation
+ * Single function to load all layout data with proper caching
+ */
+export async function getFullStoreContext(): Promise<FullStoreContext> {
+  // First get store context (cached)
+  const storeContext = await getStoreContext()
+  
+  // Then get navigation using the rootCategoryId (cached separately)
+  const { getNavigationMenu } = await import('@/src/services/category.service')
+  const navigation = await getNavigationMenu(storeContext.rootCategoryId)
+  
+  return {
+    ...storeContext,
+    navigation,
   }
 }

@@ -1,5 +1,6 @@
 'use client'
 
+// Footer component for the storefront
 import Link from 'next/link'
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from 'lucide-react'
 import { useStore } from '@/src/components/providers/StoreProvider'

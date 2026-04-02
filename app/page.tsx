@@ -2,25 +2,19 @@ import type { Metadata } from 'next'
 import { Header } from '@/src/components/layout/Header'
 import { Footer } from '@/src/components/layout/Footer'
 import { StoreProvider } from '@/src/components/providers/StoreProvider'
-import { getNavigationMenu } from '@/src/services/category.service'
-import { getStoreContext } from '@/src/services/store.service'
-import { config } from '@/src/config/env'
+import { getFullStoreContext } from '@/src/services/store.service'
 
 export const metadata: Metadata = {
-  title: config.seo.defaultTitle,
-  description: config.seo.defaultDescription,
+  title: 'Magento Store',
+  description: 'Tu tienda online con los mejores productos',
 }
 
 export default async function HomePage() {
-  // First get store context to know the root category
-  const { storeConfig, currency } = await getStoreContext()
-  
-  // Then fetch navigation using the root category from store config
-  const rootCategoryId = storeConfig?.root_category_id?.toString() || '2'
-  const navigation = await getNavigationMenu(rootCategoryId)
+  // Get full store context (storeConfig, currency, navigation) - all cached
+  const { storeConfig, currency, navigation } = await getFullStoreContext()
 
   // Use store name from Magento if available
-  const storeName = storeConfig?.store_name || config.seo.siteName
+  const storeName = storeConfig?.store_name || 'Magento Store'
 
   return (
     <StoreProvider storeConfig={storeConfig} currency={currency}>
