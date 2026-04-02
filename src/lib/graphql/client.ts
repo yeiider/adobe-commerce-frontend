@@ -21,6 +21,7 @@ export interface GraphQLRequestOptions {
   headers?: Record<string, string>
   cache?: RequestCache
   revalidate?: number
+  tags?: string[]
 }
 
 /**
@@ -49,7 +50,7 @@ function createHeaders(customHeaders?: Record<string, string>): HeadersInit {
 export async function graphqlClient<T>(
   options: GraphQLRequestOptions
 ): Promise<GraphQLResponse<T>> {
-  const { query, variables, headers: customHeaders, cache, revalidate } = options
+  const { query, variables, headers: customHeaders, cache, revalidate, tags } = options
 
   const fetchOptions: RequestInit = {
     method: 'POST',
@@ -57,37 +58,38 @@ export async function graphqlClient<T>(
     body: JSON.stringify({ query, variables }),
   }
 
-  // Handle Next.js caching
+  // Handle Next.js caching with tags support
   if (cache) {
     fetchOptions.cache = cache
   }
 
+  // Build next options for ISR with optional tags
+  const nextOptions: { revalidate?: number; tags?: string[] } = {}
+  
   if (revalidate !== undefined) {
-    fetchOptions.next = { revalidate }
+    nextOptions.revalidate = revalidate
+  }
+  
+  if (tags?.length) {
+    nextOptions.tags = tags
+  }
+  
+  if (Object.keys(nextOptions).length > 0) {
+    fetchOptions.next = nextOptions
   }
 
   try {
-    const endpoint = config.adobe.graphqlEndpoint
-    console.log('[v0] GraphQL Request to:', endpoint)
-    console.log('[v0] Query:', query.substring(0, 100) + '...')
-    
-    const response = await fetch(endpoint, fetchOptions)
+    const response = await fetch(config.adobe.graphqlEndpoint, fetchOptions)
 
     if (!response.ok) {
-      console.error('[v0] HTTP Error:', response.status, response.statusText)
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const json = await response.json()
-    console.log('[v0] GraphQL Response received:', json.data ? 'with data' : 'no data')
-    
-    if (json.errors) {
-      console.error('[v0] GraphQL Errors:', JSON.stringify(json.errors, null, 2))
-    }
     
     return json as GraphQLResponse<T>
   } catch (error) {
-    console.error('[v0] GraphQL Client Error:', error)
+    console.error('[GraphQL Client Error]:', error)
     throw error
   }
 }

@@ -38,17 +38,26 @@ export interface Category extends CategoryBasic, CategoryImage {
   product_count?: number
 }
 
-// Navigation Menu Types (Magento categoryList response)
+/**
+ * Navigation Item - Used for building the navigation menu
+ * Based on the optimized GetNavigationTreeCore query response
+ */
 export interface NavigationItem {
-  id: number
-  uid?: string
   name: string
-  url_key: string | null
   url_path: string | null
-  position: number
-  include_in_menu?: boolean
-  children_count: string | number
+  children_count?: string | number
   children?: NavigationItem[]
+}
+
+/**
+ * Root Category from categoryList response
+ * The first element contains the root category (Default Category)
+ * with children as the main navigation items
+ */
+export interface NavigationRootCategory {
+  name: string
+  url_path: string | null
+  children: NavigationItem[]
 }
 
 export interface NavigationMenu {
@@ -64,5 +73,5 @@ export interface CategoryTreeResponse {
 
 // Category List Response (categoryList query - Magento specific)
 export interface CategoryListResponse {
-  categoryList: NavigationItem[]
+  categoryList: NavigationRootCategory[]
 }

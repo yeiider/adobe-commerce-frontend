@@ -127,71 +127,32 @@ export const GET_CATEGORY_WITH_PRODUCTS = /* GraphQL */ `
 `
 
 /**
- * Get Navigation Menu using categoryList
- * Uses the root category ID (default: 2) to fetch the category tree
+ * Get Navigation Menu - Optimized query for building the navigation tree
+ * Uses the root category ID (default: "2" for Default Category)
+ * Supports up to 4 levels of nesting
+ * 
+ * Response structure:
+ * - categoryList[0] = Root category (Default Category)
+ * - categoryList[0].children = Main navigation items (Women, Men, etc.)
  */
 export const GET_NAVIGATION_MENU = /* GraphQL */ `
-  query CategoryTreeView($rootCategoryId: String = "2") {
-    categoryList(filters: { ids: { eq: $rootCategoryId } }) {
-      id
-      name
-      url_key
-      url_path
-      position
-      children_count
-      children {
-        id
-        name
-        url_key
-        url_path
-        position
-        children_count
-        children {
-          id
-          name
-          url_key
-          url_path
-          position
-          children_count
-        }
-      }
-    }
-  }
-`
-
-/**
- * Get Category Tree using categoryList
- */
-export const GET_CATEGORY_LIST_TREE = /* GraphQL */ `
-  query GetCategoryListTree($categoryId: String = "2") {
+  query GetNavigationTreeCore($categoryId: String!) {
     categoryList(filters: { ids: { eq: $categoryId } }) {
-      id
       name
-      url_key
       url_path
-      position
-      level
-      description
-      image
-      children_count
       children {
-        id
         name
-        url_key
         url_path
-        position
-        level
-        description
-        image
         children_count
         children {
-          id
           name
-          url_key
           url_path
-          position
-          level
           children_count
+          children {
+            name
+            url_path
+            children_count
+          }
         }
       }
     }

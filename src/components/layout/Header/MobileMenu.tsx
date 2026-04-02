@@ -106,7 +106,7 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
         {activeMenu && (
           <div className="border-b border-border bg-muted px-4 py-3">
             <Link
-              href={`/${activeMenu.url_path}`}
+              href={activeMenu.url_path ? `/${activeMenu.url_path}` : '#'}
               onClick={onClose}
               className="text-lg font-semibold text-foreground hover:text-primary"
             >
@@ -123,7 +123,7 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
           <ul className="divide-y divide-border">
             {currentItems.map((item) => (
               <MobileMenuItem
-                key={item.uid}
+                key={item.url_path || item.name}
                 item={item}
                 onNavigate={handleNavigate}
                 onClose={onClose}
@@ -202,7 +202,7 @@ function MobileMenuItem({ item, onNavigate, onClose }: MobileMenuItemProps) {
   return (
     <li>
       <Link
-        href={`/${item.url_path}`}
+        href={item.url_path ? `/${item.url_path}` : '#'}
         onClick={onClose}
         className="flex items-center px-4 py-3 text-foreground transition-colors hover:bg-accent"
       >

@@ -23,7 +23,7 @@ export function NavigationMenu({ items }: NavigationMenuProps) {
     <nav className="flex items-center" role="navigation" aria-label="Navegación principal">
       <ul className="flex items-center gap-1">
         {items.map((item) => (
-          <NavItem key={item.uid} item={item} />
+          <NavItem key={item.url_path || item.name} item={item} />
         ))}
       </ul>
     </nav>
@@ -59,7 +59,7 @@ function NavItem({ item }: NavItemProps) {
       onMouseLeave={handleMouseLeave}
     >
       <Link
-        href={`/${item.url_path}`}
+        href={item.url_path ? `/${item.url_path}` : '#'}
         className={cn(
           'flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground',
           isOpen && 'text-foreground'
@@ -89,19 +89,21 @@ function NavItem({ item }: NavItemProps) {
           <div className="mt-2 rounded-lg border border-border bg-background p-2 shadow-lg">
             <ul className="space-y-1">
               {item.children?.map((child) => (
-                <DropdownItem key={child.uid} item={child} />
+                <DropdownItem key={child.url_path || child.name} item={child} />
               ))}
             </ul>
 
             {/* Ver todos link */}
-            <div className="mt-2 border-t border-border pt-2">
-              <Link
-                href={`/${item.url_path}`}
-                className="block px-3 py-2 text-sm font-medium text-primary hover:underline"
-              >
-                Ver todo en {item.name}
-              </Link>
-            </div>
+            {item.url_path && (
+              <div className="mt-2 border-t border-border pt-2">
+                <Link
+                  href={`/${item.url_path}`}
+                  className="block px-3 py-2 text-sm font-medium text-primary hover:underline"
+                >
+                  Ver todo en {item.name}
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -124,7 +126,7 @@ function DropdownItem({ item }: DropdownItemProps) {
       onMouseLeave={() => setIsOpen(false)}
     >
       <Link
-        href={`/${item.url_path}`}
+        href={item.url_path ? `/${item.url_path}` : '#'}
         className={cn(
           'flex items-center justify-between rounded-md px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-accent hover:text-foreground',
           isOpen && 'bg-accent text-foreground'
@@ -147,9 +149,9 @@ function DropdownItem({ item }: DropdownItemProps) {
           <div className="ml-2 rounded-lg border border-border bg-background p-2 shadow-lg">
             <ul className="space-y-1">
               {item.children?.map((child) => (
-                <li key={child.uid}>
+                <li key={child.url_path || child.name}>
                   <Link
-                    href={`/${child.url_path}`}
+                    href={child.url_path ? `/${child.url_path}` : '#'}
                     className="block rounded-md px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
                   >
                     {child.name}

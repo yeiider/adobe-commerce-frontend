@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { Header } from '@/src/components/layout/Header'
 import { Footer } from '@/src/components/layout/Footer'
 import { getNavigationMenu } from '@/src/services/category.service'

@@ -119,15 +119,25 @@ export async function getCategoryWithProducts(
 }
 
 /**
- * Get navigation menu using Magento's categoryList query
- * @param rootCategoryId - The root category ID (default: "2" for Default Category)
+ * Navigation menu cache time (in seconds)
+ * Navigation rarely changes, so we use a longer cache time
  */
-export async function getNavigationMenu(rootCategoryId: string = "2"): Promise<NavigationItem[] | null> {
+const NAVIGATION_CACHE_TIME = 3600 // 1 hour
+
+/**
+ * Get navigation menu using Magento's categoryList query
+ * Uses aggressive caching since navigation structure rarely changes
+ * 
+ * @param categoryId - The root category ID (default: "2" for Default Category)
+ * @returns Array of navigation items (main categories with their children)
+ */
+export async function getNavigationMenu(categoryId: string = "2"): Promise<NavigationItem[] | null> {
   try {
     const { data, errors } = await graphqlClient<CategoryListResponse>({
       query: GET_NAVIGATION_MENU,
-      variables: { rootCategoryId },
-      revalidate: config.cache.revalidateTime,
+      variables: { categoryId },
+      revalidate: NAVIGATION_CACHE_TIME,
+      tags: ['navigation', 'categories'],
     })
 
     if (errors) {
@@ -135,7 +145,7 @@ export async function getNavigationMenu(rootCategoryId: string = "2"): Promise<N
       return null
     }
     
-    // categoryList returns an array directly, not nested in items
+    // categoryList returns an array with the root category
     if (!data?.categoryList?.length) {
       console.error('[CategoryService] No categories found in response')
       return null
