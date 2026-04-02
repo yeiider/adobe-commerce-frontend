@@ -1,6 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 import { Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin } from 'lucide-react'
-import { config } from '@/src/config/env'
+import { useStore } from '@/src/components/providers/StoreProvider'
 
 interface FooterLink {
   label: string
@@ -36,7 +38,9 @@ const socialLinks = [
 ]
 
 export function Footer() {
+  const { storeConfig } = useStore()
   const currentYear = new Date().getFullYear()
+  const storeName = storeConfig?.store_name || 'Magento Store'
 
   return (
     <footer className="border-t border-border bg-muted/50">
@@ -47,7 +51,7 @@ export function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block">
               <span className="text-xl font-bold text-foreground">
-                {config.seo.siteName}
+                {storeName}
               </span>
             </Link>
             <p className="mt-4 max-w-md text-sm text-muted-foreground">
@@ -118,7 +122,7 @@ export function Footer() {
       <div className="border-t border-border">
         <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 py-6 md:flex-row">
           <p className="text-sm text-muted-foreground">
-            &copy; {currentYear} {config.seo.siteName}. Todos los derechos reservados.
+            &copy; {currentYear} {storeName}. Todos los derechos reservados.
           </p>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">

@@ -14,7 +14,11 @@ import {
 } from '@/src/lib/graphql/queries/category.queries'
 import { Category, NavigationItem, CategoryTreeResponse, CategoryListResponse } from '@/src/types/category.types'
 import { ProductsResponse } from '@/src/types/product.types'
-import { config } from '@/src/config/env'
+
+/**
+ * Default cache time for category data (5 minutes)
+ */
+const DEFAULT_CACHE_TIME = 300
 
 export interface GetCategoryWithProductsOptions {
   urlPath: string
@@ -34,7 +38,7 @@ export async function getCategoryTree(parentId: number = 2): Promise<Category[] 
   const { data, errors } = await graphqlClient<CategoryTreeResponse>({
     query: GET_CATEGORY_TREE,
     variables: { parentId },
-    revalidate: config.cache.revalidateTime,
+    revalidate: DEFAULT_CACHE_TIME,
   })
 
   if (errors || !data?.categories?.items) {
@@ -51,7 +55,7 @@ export async function getCategoryByUrlKey(urlKey: string): Promise<Category | nu
   const { data, errors } = await graphqlClient<CategoryTreeResponse>({
     query: GET_CATEGORY_BY_URL_KEY,
     variables: { urlKey },
-    revalidate: config.cache.revalidateTime,
+    revalidate: DEFAULT_CACHE_TIME,
   })
 
   if (errors || !data?.categories?.items?.length) {
@@ -68,7 +72,7 @@ export async function getCategoryByUrlPath(urlPath: string): Promise<Category | 
   const { data, errors } = await graphqlClient<CategoryTreeResponse>({
     query: GET_CATEGORY_BY_URL_PATH,
     variables: { urlPath },
-    revalidate: config.cache.revalidateTime,
+    revalidate: DEFAULT_CACHE_TIME,
   })
 
   if (errors || !data?.categories?.items?.length) {
@@ -85,7 +89,7 @@ export async function getCategoryById(id: number): Promise<Category | null> {
   const { data, errors } = await graphqlClient<CategoryTreeResponse>({
     query: GET_CATEGORY_BY_ID,
     variables: { id },
-    revalidate: config.cache.revalidateTime,
+    revalidate: DEFAULT_CACHE_TIME,
   })
 
   if (errors || !data?.categories?.items?.length) {
@@ -108,7 +112,7 @@ export async function getCategoryWithProducts(
   }>({
     query: GET_CATEGORY_WITH_PRODUCTS,
     variables: { urlPath, pageSize, currentPage, sort },
-    revalidate: config.cache.revalidateTime,
+    revalidate: DEFAULT_CACHE_TIME,
   })
 
   if (errors || !data?.categories?.items?.length) {

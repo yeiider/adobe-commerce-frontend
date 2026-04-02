@@ -3,8 +3,38 @@
  * All store configuration queries for Adobe Commerce
  */
 
+/**
+ * Core Store Configuration - Essential fields for the storefront
+ * Used for: locale, URLs, SEO, branding, catalog settings
+ */
 export const GET_STORE_CONFIG = /* GraphQL */ `
   query GetStoreConfig {
+    storeConfig {
+      store_code
+      store_name
+      locale
+      timezone
+      base_currency_code
+      default_display_currency_code
+      base_url
+      secure_base_media_url
+      logo_alt
+      copyright
+      show_cms_breadcrumbs
+      grid_per_page
+      root_category_id
+      category_url_suffix
+      product_url_suffix
+    }
+  }
+`
+
+/**
+ * Full Store Configuration - All available fields
+ * Used when more detailed config is needed
+ */
+export const GET_STORE_CONFIG_FULL = /* GraphQL */ `
+  query GetStoreConfigFull {
     storeConfig {
       id
       code
@@ -34,6 +64,7 @@ export const GET_STORE_CONFIG = /* GraphQL */ `
       header_logo_src
       logo_width
       logo_height
+      logo_alt
       copyright
       catalog_default_sort_by
       grid_per_page_values
@@ -73,8 +104,12 @@ export const GET_AVAILABLE_STORES = /* GraphQL */ `
   }
 `
 
-export const GET_CURRENCY = /* GraphQL */ `
-  query GetCurrency {
+/**
+ * Currency Configuration
+ * Used for: price formatting, multi-currency support, exchange rates
+ */
+export const GET_CURRENCY_CONFIG = /* GraphQL */ `
+  query GetCurrencyConfig {
     currency {
       base_currency_code
       base_currency_symbol
@@ -88,3 +123,6 @@ export const GET_CURRENCY = /* GraphQL */ `
     }
   }
 `
+
+// Alias for backward compatibility
+export const GET_CURRENCY = GET_CURRENCY_CONFIG
