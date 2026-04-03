@@ -96,3 +96,38 @@ export interface SEOMetadata {
   meta_description?: string
   canonical_url?: string
 }
+
+// Filter Types for Layered Navigation
+export type FilterInputType = 
+  | { eq: string }
+  | { in: string[] }
+  | { from: string; to: string }
+  | { match: string }
+
+export interface ProductAttributeFilterInput {
+  category_id?: FilterInputType
+  category_uid?: FilterInputType
+  price?: { from: string; to: string }
+  name?: { match: string }
+  sku?: FilterInputType
+  url_key?: FilterInputType
+  [key: string]: FilterInputType | undefined
+}
+
+export interface ActiveFilter {
+  attributeCode: string
+  label: string
+  value: string
+  valueLabel: string
+}
+
+export interface FilterState {
+  [attributeCode: string]: string | string[]
+}
+
+// Sort Types
+export type SortDirection = 'ASC' | 'DESC'
+
+export interface ProductAttributeSortInput {
+  [field: string]: SortDirection
+}

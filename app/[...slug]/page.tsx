@@ -6,10 +6,13 @@ import { Header } from '@/src/components/layout/Header'
 import { Footer } from '@/src/components/layout/Footer'
 import { StoreProvider } from '@/src/components/providers/StoreProvider'
 import { getFullStoreContext } from '@/src/services/store.service'
-import { getCategoryWithProducts, type CategoryWithProducts } from '@/src/services/category.service'
+import { getCategoryByUrlPath } from '@/src/services/category.service'
+import { getProductsByFilter } from '@/src/services/product.service'
 import { CategoryProductList } from '@/src/components/category/CategoryProductList'
 import { CategoryPagination } from '@/src/components/category/CategoryPagination'
 import { CategoryBreadcrumbs } from '@/src/components/category/CategoryBreadcrumbs'
+import { FilterSidebar, ProductToolbar } from '@/src/components/filters'
+import { parseFiltersFromUrl, buildGraphQLFilter, parseSortParam } from '@/src/utils/filters'
 import { config } from '@/src/config/env'
 
 interface CategoryPageProps {
@@ -19,6 +22,7 @@ interface CategoryPageProps {
   searchParams: Promise<{
     page?: string
     sort?: string
+    [key: string]: string | string[] | undefined
   }>
 }
 
@@ -29,11 +33,7 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
   const { slug } = await params
   const urlPath = slug.join('/')
   
-  const category = await getCategoryWithProducts({ 
-    urlPath, 
-    pageSize: 1,
-    currentPage: 1 
-  })
+  const category = await getCategoryByUrlPath(urlPath)
 
   if (!category) {
     return {
@@ -82,40 +82,43 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
   const { slug } = await params
-  const { page, sort } = await searchParams
+  const resolvedSearchParams = await searchParams
+  const { page, sort, ...filterParams } = resolvedSearchParams
   
   // Construct URL path from slug segments
   const urlPath = slug.join('/')
-  const currentPage = page ? parseInt(page, 10) : 1
+  const currentPage = page ? parseInt(page as string, 10) : 1
   const pageSize = 20
 
-  // Parse sort parameter (e.g., "position_ASC" -> { position: 'ASC' })
-  let sortOptions: Record<string, 'ASC' | 'DESC'> | undefined
-  if (sort) {
-    const [field, direction] = sort.split('_')
-    if (field && (direction === 'ASC' || direction === 'DESC')) {
-      sortOptions = { [field]: direction }
-    }
-  }
+  // Parse sort parameter
+  const sortOptions = parseSortParam(sort as string)
+  
+  // Parse filter params from URL
+  const filterState = parseFiltersFromUrl(filterParams as Record<string, string | string[]>)
 
-  // Fetch category with products and store context in parallel
-  const [categoryData, storeContext] = await Promise.all([
-    getCategoryWithProducts({
-      urlPath,
-      pageSize,
-      currentPage,
-      sort: sortOptions,
-    }),
+  // Fetch category and store context first
+  const [category, storeContext] = await Promise.all([
+    getCategoryByUrlPath(urlPath),
     getFullStoreContext(),
   ])
 
   // If category not found, return 404
-  if (!categoryData) {
+  if (!category) {
     notFound()
   }
 
+  // Build GraphQL filter with category ID
+  const graphqlFilter = buildGraphQLFilter(filterState, category.uid)
+
+  // Fetch products with filters
+  const products = await getProductsByFilter({
+    filter: graphqlFilter,
+    pageSize,
+    currentPage,
+    sort: sortOptions,
+  })
+
   const { storeConfig, currency, navigation } = storeContext
-  const { products, ...category } = categoryData
 
   return (
     <StoreProvider storeConfig={storeConfig} currency={currency}>
@@ -158,42 +161,68 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                   {category.description}
                 </p>
               )}
-
-              {/* Products count */}
-              <p className="mt-4 text-sm text-muted-foreground">
-                {products.total_count} {products.total_count === 1 ? 'producto' : 'productos'}
-              </p>
             </div>
 
-            {/* Products Grid */}
-            {products.items.length > 0 ? (
-              <>
-                <CategoryProductList products={products.items} />
-                
-                {/* Pagination */}
-                {products.page_info.total_pages > 1 && (
-                  <div className="mt-8">
-                    <CategoryPagination
-                      currentPage={products.page_info.current_page}
-                      totalPages={products.page_info.total_pages}
-                      basePath={`/${urlPath}`}
-                    />
+            {/* Main Content with Sidebar */}
+            <div className="flex gap-8">
+              {/* Filter Sidebar - Desktop */}
+              {products?.aggregations && products.aggregations.length > 0 && (
+                <div className="hidden w-64 flex-shrink-0 lg:block">
+                  <FilterSidebar 
+                    aggregations={products.aggregations}
+                    categoryId={category.uid}
+                  />
+                </div>
+              )}
+
+              {/* Products Section */}
+              <div className="flex-1">
+                {/* Toolbar */}
+                <ProductToolbar
+                  totalCount={products?.total_count || 0}
+                  sortFields={products?.sort_fields}
+                  filterContent={
+                    products?.aggregations && products.aggregations.length > 0 ? (
+                      <FilterSidebar 
+                        aggregations={products.aggregations}
+                        categoryId={category.uid}
+                      />
+                    ) : undefined
+                  }
+                  className="mb-6"
+                />
+
+                {/* Products Grid */}
+                {products && products.items.length > 0 ? (
+                  <>
+                    <CategoryProductList products={products.items} />
+                    
+                    {/* Pagination */}
+                    {products.page_info.total_pages > 1 && (
+                      <div className="mt-8">
+                        <CategoryPagination
+                          currentPage={products.page_info.current_page}
+                          totalPages={products.page_info.total_pages}
+                          basePath={`/${urlPath}`}
+                        />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <p className="text-lg text-muted-foreground">
+                      No hay productos disponibles con los filtros seleccionados.
+                    </p>
+                    <Link
+                      href={`/${urlPath}`}
+                      className="mt-4 text-primary hover:underline"
+                    >
+                      Limpiar filtros
+                    </Link>
                   </div>
                 )}
-              </>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <p className="text-lg text-muted-foreground">
-                  No hay productos disponibles en esta categoria.
-                </p>
-                <Link
-                  href="/"
-                  className="mt-4 text-primary hover:underline"
-                >
-                  Volver al inicio
-                </Link>
               </div>
-            )}
+            </div>
           </div>
         </main>
         

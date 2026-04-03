@@ -145,16 +145,70 @@ export const GET_PRODUCTS_BY_FILTER = /* GraphQL */ `
           value
         }
       }
+      sort_fields {
+        default
+        options {
+          label
+          value
+        }
+      }
       items {
-        ...ProductBasic
-        ...ProductPrice
-        ...ProductImage
+        __typename
+        uid
+        sku
+        name
+        url_key
+        url_suffix
+        stock_status
+        thumbnail {
+          url
+          label
+        }
+        price_range {
+          minimum_price {
+            regular_price {
+              value
+              currency
+            }
+            final_price {
+              value
+              currency
+            }
+            discount {
+              amount_off
+              percent_off
+            }
+          }
+        }
+        ... on ConfigurableProduct {
+          configurable_options {
+            id
+            uid
+            attribute_id
+            attribute_code
+            label
+            position
+            values {
+              uid
+              value_index
+              label
+              swatch_data {
+                ... on ColorSwatchData {
+                  value
+                }
+                ... on TextSwatchData {
+                  value
+                }
+                ... on ImageSwatchData {
+                  thumbnail
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
-  ${PRODUCT_BASIC_FRAGMENT}
-  ${PRODUCT_PRICE_FRAGMENT}
-  ${PRODUCT_IMAGE_FRAGMENT}
 `
 
 export const GET_PRODUCT_REVIEWS = /* GraphQL */ `
