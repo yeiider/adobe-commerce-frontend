@@ -82,9 +82,27 @@ export async function getProductsByCategory(options: GetProductsOptions): Promis
 }
 
 /**
+ * Empty response for when no products are found
+ */
+const EMPTY_PRODUCTS_RESPONSE: ProductsResponse = {
+  total_count: 0,
+  page_info: {
+    current_page: 1,
+    page_size: 20,
+    total_pages: 0,
+  },
+  aggregations: [],
+  sort_fields: {
+    default: 'relevance',
+    options: [],
+  },
+  items: [],
+}
+
+/**
  * Get products by filter
  */
-export async function getProductsByFilter(options: GetProductsOptions): Promise<ProductsResponse | null> {
+export async function getProductsByFilter(options: GetProductsOptions): Promise<ProductsResponse> {
   const { filter, pageSize = 20, currentPage = 1, sort } = options
 
   const { data, errors } = await graphqlClient<{ products: ProductsResponse }>({
@@ -94,7 +112,8 @@ export async function getProductsByFilter(options: GetProductsOptions): Promise<
   })
 
   if (errors || !data?.products) {
-    return null
+    console.error('[ProductService] Error fetching products:', errors)
+    return EMPTY_PRODUCTS_RESPONSE
   }
 
   return data.products

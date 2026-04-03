@@ -75,9 +75,24 @@ export interface Product extends ProductBasic, ProductImages {
   crosssell_products?: ProductBasic[]
 }
 
-// Configurable Product Types
-export interface SwatchData {
-  value: string
+// Configurable Product Types - Swatch Types
+export interface ColorSwatchData {
+  __typename?: 'ColorSwatchData'
+  value: string // Hex color code, e.g., "#FF0000"
+}
+
+export interface TextSwatchData {
+  __typename?: 'TextSwatchData'
+  value: string // Text value, e.g., "XL"
+}
+
+export interface ImageSwatchData {
+  __typename?: 'ImageSwatchData'
+  thumbnail: string // URL of the swatch image
+}
+
+export type SwatchData = ColorSwatchData | TextSwatchData | ImageSwatchData | {
+  value?: string
   thumbnail?: string
 }
 
@@ -85,7 +100,7 @@ export interface ConfigurableOptionValue {
   uid: string
   value_index: number
   label: string
-  swatch_data?: SwatchData
+  swatch_data?: SwatchData | null
 }
 
 export interface ConfigurableOption {

@@ -7,16 +7,55 @@ import { Money } from '@/src/types/common.types'
 import { config } from '@/src/config/env'
 
 /**
+ * Normalize locale format from underscore to hyphen (es_CO -> es-CO)
+ * Falls back to 'en-US' if locale is invalid or empty
+ */
+function normalizeLocale(locale: string | undefined | null): string {
+  if (!locale) return 'en-US'
+  const normalized = locale.replace(/_/g, '-')
+  // Validate the locale format (basic check)
+  if (!/^[a-z]{2}(-[A-Z]{2})?$/i.test(normalized)) {
+    return 'en-US'
+  }
+  return normalized
+}
+
+/**
  * Format price with currency
+ * @param price - Money object or number value
+ * @param currencyCode - Currency code (required if price is a number)
  */
 export function formatPrice(price: Money | number, currencyCode?: string): string {
   const value = typeof price === 'number' ? price : price.value
-  const currency = typeof price === 'number' ? currencyCode || config.adobe.currencyCode : price.currency
+  const currency = typeof price === 'number' 
+    ? (currencyCode || config.adobe.currencyCode || 'USD') 
+    : (currencyCode || price.currency || 'USD')
+  
+  // Normalize locale from es_CO to es-CO format
+  const rawLocale = config.adobe.locale || 'en-US'
+  const locale = rawLocale.replace(/_/g, '-')
 
-  return new Intl.NumberFormat(config.adobe.locale, {
-    style: 'currency',
-    currency: currency,
-  }).format(value)
+  // Some currencies like COP typically don't show decimals
+  const currenciesWithoutDecimals = ['COP', 'JPY', 'KRW', 'VND']
+  const minimumFractionDigits = currenciesWithoutDecimals.includes(currency) ? 0 : 2
+  const maximumFractionDigits = currenciesWithoutDecimals.includes(currency) ? 0 : 2
+
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits,
+      maximumFractionDigits,
+    }).format(value)
+  } catch {
+    // Fallback to en-US if locale is invalid
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits,
+      maximumFractionDigits,
+    }).format(value)
+  }
 }
 
 /**
@@ -49,7 +88,8 @@ export function formatDate(
   }
 ): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date
-  return new Intl.DateTimeFormat(config.adobe.locale, options).format(dateObj)
+  const locale = normalizeLocale(config.adobe.locale)
+  return new Intl.DateTimeFormat(locale, options).format(dateObj)
 }
 
 /**
@@ -82,10 +122,11 @@ export function formatRelativeTime(date: string | Date): string {
     minute: 60,
   }
 
+  const locale = normalizeLocale(config.adobe.locale)
   for (const [unit, seconds] of Object.entries(intervals)) {
     const interval = Math.floor(diffInSeconds / seconds)
     if (interval >= 1) {
-      const rtf = new Intl.RelativeTimeFormat(config.adobe.locale, { numeric: 'auto' })
+      const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
       return rtf.format(-interval, unit as Intl.RelativeTimeFormatUnit)
     }
   }

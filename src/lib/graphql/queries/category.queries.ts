@@ -88,6 +88,7 @@ export const GET_CATEGORY_WITH_PRODUCTS = /* GraphQL */ `
             total_pages
           }
           items {
+            __typename
             uid
             sku
             name
@@ -111,6 +112,45 @@ export const GET_CATEGORY_WITH_PRODUCTS = /* GraphQL */ `
                 discount {
                   amount_off
                   percent_off
+                }
+              }
+            }
+            ... on ConfigurableProduct {
+              configurable_options {
+                id
+                uid
+                attribute_id
+                attribute_code
+                label
+                position
+                values {
+                  uid
+                  value_index
+                  label
+                  swatch_data {
+                    ... on ColorSwatchData {
+                      value
+                    }
+                    ... on TextSwatchData {
+                      value
+                    }
+                    ... on ImageSwatchData {
+                      thumbnail
+                    }
+                  }
+                }
+              }
+              variants {
+                attributes {
+                  uid
+                  code
+                  value_index
+                  label
+                }
+                product {
+                  uid
+                  sku
+                  stock_status
                 }
               }
             }
