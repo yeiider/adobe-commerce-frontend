@@ -17,6 +17,7 @@ import {
   AvailableStoresResponse,
   CurrencyResponse,
 } from '@/src/types/store.types'
+import { config } from '@/src/config/env'
 
 /**
  * Cache time for store configuration (in seconds)
@@ -119,8 +120,10 @@ export async function getStoreContext(): Promise<StoreContext> {
     getCurrencyConfig(),
   ])
 
-  // Extract root category ID from store config, default to "2" (Magento default)
-  const rootCategoryId = storeConfig?.root_category_id?.toString() || '2'
+  // Extract root category ID from: storeConfig > env config > default
+  const rootCategoryId = 
+    storeConfig?.root_category_id?.toString() || 
+    config.adobe.defaultRootCategoryId
 
   return {
     storeConfig,

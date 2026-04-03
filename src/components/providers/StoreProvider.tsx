@@ -7,6 +7,7 @@
 
 import { createContext, useContext, type ReactNode } from 'react'
 import type { StoreConfig, Currency } from '@/src/types/store.types'
+import { config } from '@/src/config/env'
 
 /**
  * Store Context Type
@@ -23,13 +24,21 @@ export interface StoreContextType {
 }
 
 /**
- * Default context value
+ * Default context value using env config
  */
 const defaultContext: StoreContextType = {
   storeConfig: null,
   currency: null,
-  rootCategoryId: '2',
-  formatPrice: (price: number) => `$${price.toFixed(2)}`,
+  rootCategoryId: config.adobe.defaultRootCategoryId,
+  formatPrice: (price: number) => {
+    const locale = config.adobe.locale.replace('_', '-')
+    const currency = config.adobe.currencyCode
+    try {
+      return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(price)
+    } catch {
+      return `$${price.toFixed(2)}`
+    }
+  },
   getMediaUrl: (path: string) => path,
   getCategoryUrl: (urlPath: string) => `/${urlPath}`,
   getProductUrl: (urlKey: string) => `/${urlKey}`,
@@ -52,8 +61,11 @@ interface StoreProviderProps {
  * Wraps the application with store context
  */
 export function StoreProvider({ children, storeConfig, currency, rootCategoryId }: StoreProviderProps) {
-  // Derive rootCategoryId from storeConfig if not provided
-  const effectiveRootCategoryId = rootCategoryId || storeConfig?.root_category_id?.toString() || '2'
+  // Derive rootCategoryId from: prop > storeConfig > env config > default
+  const effectiveRootCategoryId = 
+    rootCategoryId || 
+    storeConfig?.root_category_id?.toString() || 
+    config.adobe.defaultRootCategoryId
   /**
    * Format price with currency symbol
    */
@@ -72,8 +84,11 @@ export function StoreProvider({ children, storeConfig, currency, rootCategoryId 
     }
 
     // Use Intl.NumberFormat for proper formatting
+    // Priority: storeConfig.locale > env config locale > default
+    const locale = storeConfig?.locale || config.adobe.locale || 'es-CO'
+    
     try {
-      return new Intl.NumberFormat(storeConfig?.locale || 'en-US', {
+      return new Intl.NumberFormat(locale.replace('_', '-'), {
         style: 'currency',
         currency: code,
       }).format(price)

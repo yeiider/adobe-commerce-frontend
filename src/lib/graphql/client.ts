@@ -26,14 +26,21 @@ export interface GraphQLRequestOptions {
 
 /**
  * Creates the base headers for Adobe Commerce GraphQL requests
+ * 
+ * Magento uses these headers to determine:
+ * - Store: Which store view to use (determines language, catalog, prices)
+ * - Content-Currency: Which currency to display prices in
  */
 function createHeaders(customHeaders?: Record<string, string>): HeadersInit {
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
+    // Store view code - determines catalog, CMS content, and language
     'Store': config.adobe.storeViewCode,
+    // Currency code - determines price display currency
+    'Content-Currency': config.adobe.currencyCode,
   }
 
-  // Add customer token if available (client-side)
+  // Add customer token if available (client-side only)
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem(config.auth.customerTokenKey)
     if (token) {
@@ -42,6 +49,23 @@ function createHeaders(customHeaders?: Record<string, string>): HeadersInit {
   }
 
   return { ...headers, ...customHeaders }
+}
+
+/**
+ * Get headers for server-side requests with optional customer token
+ */
+export function getServerHeaders(customerToken?: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Store': config.adobe.storeViewCode,
+    'Content-Currency': config.adobe.currencyCode,
+  }
+  
+  if (customerToken) {
+    headers['Authorization'] = `Bearer ${customerToken}`
+  }
+  
+  return headers
 }
 
 /**

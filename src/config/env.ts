@@ -6,11 +6,20 @@
 export const config = {
   // Adobe Commerce API Configuration
   adobe: {
+    /** GraphQL endpoint URL */
     graphqlEndpoint: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_GRAPHQL_URL || '',
+    /** Store code (website level) */
     storeCode: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_STORE_CODE || 'default',
+    /** Store view code (determines language, catalog) - sent as "Store" header */
     storeViewCode: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_STORE_VIEW_CODE || 'default',
-    currencyCode: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_CURRENCY_CODE || 'USD',
-    locale: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_LOCALE || 'en_US',
+    /** Default currency code - sent as "Content-Currency" header */
+    currencyCode: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_CURRENCY_CODE || 'COP',
+    /** Locale for formatting (e.g., es_CO, en_US) */
+    locale: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_LOCALE || 'es_CO',
+    /** Website ID (optional, for multi-website setups) */
+    websiteId: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_WEBSITE_ID || '1',
+    /** Root category ID (fetched from storeConfig, this is a fallback) */
+    defaultRootCategoryId: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_ROOT_CATEGORY_ID || '2',
   },
 
   // Authentication

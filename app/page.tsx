@@ -4,6 +4,7 @@ import { Footer } from '@/src/components/layout/Footer'
 import { StoreProvider } from '@/src/components/providers/StoreProvider'
 import { getFullStoreContext } from '@/src/services/store.service'
 
+// Metadata for SEO
 export const metadata: Metadata = {
   title: 'Magento Store',
   description: 'Tu tienda online con los mejores productos',
