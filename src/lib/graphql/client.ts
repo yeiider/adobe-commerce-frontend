@@ -103,13 +103,25 @@ export async function graphqlClient<T>(
   }
 
   try {
+    console.log('[v0] GraphQL Request to:', config.adobe.graphqlEndpoint)
+    console.log('[v0] Headers:', JSON.stringify(createHeaders(customHeaders)))
+    console.log('[v0] Query preview:', query.substring(0, 200))
+    
     const response = await fetch(config.adobe.graphqlEndpoint, fetchOptions)
 
     if (!response.ok) {
+      // Try to get the error body for debugging
+      const errorBody = await response.text()
+      console.error('[v0] HTTP Error Response Body:', errorBody)
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     const json = await response.json()
+    console.log('[v0] Response received, has data:', !!json.data, 'has errors:', !!json.errors)
+    
+    if (json.errors) {
+      console.error('[v0] GraphQL Errors:', JSON.stringify(json.errors, null, 2))
+    }
     
     return json as GraphQLResponse<T>
   } catch (error) {
