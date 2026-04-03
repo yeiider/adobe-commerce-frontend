@@ -30,7 +30,7 @@ export function LoadingLink({
   onClick,
   ...props
 }: LoadingLinkProps) {
-  const { startLoading } = useGlobalLoading()
+  const { startNavigationLoading } = useGlobalLoading()
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -40,15 +40,15 @@ export function LoadingLink({
         return
       }
 
-      // Start global loading
+      // Start navigation loading (auto-closes on route change)
       if (showLoader) {
-        startLoading(loadingMessage)
+        startNavigationLoading(loadingMessage)
       }
 
       // Call original onClick if provided
       onClick?.(e)
     },
-    [onClick, showLoader, startLoading, loadingMessage]
+    [onClick, showLoader, startNavigationLoading, loadingMessage]
   )
 
   return (

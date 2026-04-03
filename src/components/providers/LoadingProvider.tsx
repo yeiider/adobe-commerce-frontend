@@ -45,6 +45,8 @@ export interface LoadingContextType {
   setProgress: (progress: number | null) => void
   /** Track an async operation */
   trackPromise: <T>(promise: Promise<T>, message?: string) => Promise<T>
+  /** Start navigation loading (auto-closes on route change) */
+  startNavigationLoading: (message?: string) => void
 }
 
 const LoadingContext = createContext<LoadingContextType | null>(null)
@@ -84,6 +86,7 @@ export function LoadingProvider({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const previousUrl = useRef<string | null>(null)
+  const isNavigating = useRef(false)
 
   // Clean up timeout on unmount
   useEffect(() => {
@@ -94,26 +97,49 @@ export function LoadingProvider({
     }
   }, [])
 
-  // Detect route changes
+  // Detect route changes - this effect runs AFTER navigation completes
   useEffect(() => {
     if (!detectRouteChanges) return
 
     const currentUrl = `${pathname}?${searchParams?.toString() || ''}`
 
-    if (previousUrl.current !== null && previousUrl.current !== currentUrl) {
-      // Route changed, show loader
-      showLoader('Cargando...')
+    // If we were navigating and URL has changed, hide the loader
+    if (isNavigating.current || (previousUrl.current !== null && previousUrl.current !== currentUrl)) {
+      isNavigating.current = false
+      // Reset active requests since navigation completed
+      activeRequests.current = 0
       
-      // Auto-hide after a short delay (content should be ready)
+      // Small delay to ensure content is rendered
       const timer = setTimeout(() => {
-        hideLoader()
-      }, 500)
+        setIsLoading(false)
+        setMessage(null)
+        setProgress(null)
+        loadingStartTime.current = null
+      }, 100)
 
+      previousUrl.current = currentUrl
       return () => clearTimeout(timer)
     }
 
     previousUrl.current = currentUrl
   }, [pathname, searchParams, detectRouteChanges])
+
+  /**
+   * Start navigation loading - will auto-close when route changes
+   */
+  const startNavigationLoading = useCallback((msg?: string) => {
+    isNavigating.current = true
+    
+    // Clear any pending hide timeout
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current)
+      hideTimeoutRef.current = null
+    }
+
+    loadingStartTime.current = Date.now()
+    setIsLoading(true)
+    if (msg) setMessage(msg)
+  }, [])
 
   /**
    * Show the global loader
@@ -193,6 +219,7 @@ export function LoadingProvider({
     setMessage,
     setProgress,
     trackPromise,
+    startNavigationLoading,
   }
 
   return (
