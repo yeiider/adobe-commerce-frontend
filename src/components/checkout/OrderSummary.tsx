@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import type { Cart } from '@/src/types/cart.types'
+import { CouponForm } from '@/src/components/cart/CouponForm'
 
 interface Props {
   cart: Cart | null
@@ -59,6 +60,8 @@ export function OrderSummary({ cart }: Props) {
           </div>
         ))}
       </div>
+
+      <CouponForm />
 
       <div className="border-t pt-4 space-y-3">
         <div className="flex justify-between text-sm">
