@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X, ShoppingCart, User, Search, Heart } from 'lucide-react'
+import { Menu, Search, Heart } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NavigationMenu } from './NavigationMenu'
 import { MobileMenu } from './MobileMenu'
@@ -10,6 +10,7 @@ import { SearchBar } from './SearchBar'
 import { config } from '@/src/config/env'
 import type { NavigationItem } from '@/src/types/category.types'
 import { MiniCart } from '@/src/components/cart/index'
+import { AccountButton } from './AccountButton'
 
 interface HeaderProps {
   navigation: NavigationItem[] | null
@@ -87,11 +88,7 @@ export function Header({ navigation }: HeaderProps) {
             )}
 
             {/* Account */}
-            <Button variant="ghost" size="icon" asChild aria-label="Mi cuenta">
-              <Link href="/customer/account">
-                <User className="h-5 w-5" />
-              </Link>
-            </Button>
+            <AccountButton />
 
             {/* Cart */}
             <MiniCart />

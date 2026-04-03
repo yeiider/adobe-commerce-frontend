@@ -126,3 +126,21 @@ export const GET_CURRENCY_CONFIG = /* GraphQL */ `
 
 // Alias for backward compatibility
 export const GET_CURRENCY = GET_CURRENCY_CONFIG
+
+/**
+ * Country regions — used for address forms
+ */
+export const GET_COUNTRY_REGIONS = /* GraphQL */ `
+  query GetCountryRegions($id: String!) {
+    country(id: $id) {
+      id
+      two_letter_abbreviation
+      full_name_locale
+      available_regions {
+        id
+        code
+        name
+      }
+    }
+  }
+`

@@ -36,6 +36,13 @@ import {
   CustomerToken,
 } from '@/src/types/customer.types'
 import { config } from '@/src/config/env'
+import { GET_COUNTRY_REGIONS } from '@/src/lib/graphql/queries/store.queries'
+
+export interface CountryRegion {
+  id: number
+  code: string
+  name: string
+}
 
 /**
  * Create a new customer
@@ -336,6 +343,25 @@ export async function subscribeToNewsletter(email: string): Promise<boolean> {
   })
 
   return !errors && data?.subscribeEmailToNewsletter?.status === 'SUBSCRIBED'
+}
+
+/**
+ * Get available regions for a country from Adobe Commerce
+ */
+export async function getCountryRegions(countryCode: string): Promise<CountryRegion[]> {
+  const { data, errors } = await graphqlClient<{
+    country: { available_regions: CountryRegion[] }
+  }>({
+    query: GET_COUNTRY_REGIONS,
+    variables: { id: countryCode },
+    revalidate: 86400, // 24h — regions rarely change
+  })
+
+  if (errors || !data?.country?.available_regions) {
+    return []
+  }
+
+  return data.country.available_regions
 }
 
 /**

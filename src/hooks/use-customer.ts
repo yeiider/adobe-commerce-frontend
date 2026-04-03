@@ -23,11 +23,13 @@ const CUSTOMER_KEY = 'adobe-commerce-customer'
 
 export function useCustomer() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isInitializing, setIsInitializing] = useState(true)
 
-  // Check for stored token on mount
+  // Check for stored token on mount — must complete before guards evaluate auth state
   useEffect(() => {
     const token = getStoredCustomerToken()
     setIsAuthenticated(!!token)
+    setIsInitializing(false)
   }, [])
 
   // Fetch customer data
@@ -107,6 +109,7 @@ export function useCustomer() {
   return {
     customer,
     isAuthenticated,
+    isInitializing,
     isLoading,
     error,
     login,
