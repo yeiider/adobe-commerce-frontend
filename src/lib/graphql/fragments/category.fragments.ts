@@ -22,7 +22,6 @@ export const CATEGORY_SEO_FRAGMENT = /* GraphQL */ `
     meta_title
     meta_keywords
     meta_description
-    canonical_url
   }
 `
 

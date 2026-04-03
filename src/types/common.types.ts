@@ -94,7 +94,6 @@ export interface SEOMetadata {
   meta_title?: string
   meta_keywords?: string
   meta_description?: string
-  canonical_url?: string
 }
 
 // Filter Types for Layered Navigation

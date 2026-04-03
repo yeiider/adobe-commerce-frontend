@@ -10,6 +10,7 @@ import {
   GET_PRODUCTS_BY_CATEGORY,
   GET_PRODUCTS_BY_FILTER,
   GET_PRODUCT_REVIEWS,
+  GET_FULL_PRODUCT_DETAILS,
 } from '@/src/lib/graphql/queries/product.queries'
 import { Product, ProductsResponse, ProductReviews } from '@/src/types/product.types'
 import { config } from '@/src/config/env'
@@ -34,6 +35,23 @@ export interface GetProductReviewsOptions {
 export async function getProductByUrlKey(urlKey: string): Promise<Product | null> {
   const { data, errors } = await graphqlClient<{ products: { items: Product[] } }>({
     query: GET_PRODUCT_BY_URL_KEY,
+    variables: { urlKey },
+    revalidate: config.cache.revalidateTime,
+  })
+
+  if (errors || !data?.products?.items?.length) {
+    return null
+  }
+
+  return data.products.items[0]
+}
+
+/**
+ * Get a single product with full dynamic details by URL key
+ */
+export async function getFullProductDetails(urlKey: string): Promise<Product | null> {
+  const { data, errors } = await graphqlClient<{ products: { items: Product[] } }>({
+    query: GET_FULL_PRODUCT_DETAILS,
     variables: { urlKey },
     revalidate: config.cache.revalidateTime,
   })

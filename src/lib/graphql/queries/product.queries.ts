@@ -205,6 +205,26 @@ export const GET_PRODUCTS_BY_FILTER = /* GraphQL */ `
               }
             }
           }
+          variants {
+            attributes {
+              code
+              value_index
+            }
+            product {
+              sku
+              thumbnail {
+                url
+              }
+              price_range {
+                maximum_price {
+                  final_price {
+                    value
+                    currency
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -243,4 +263,177 @@ export const GET_PRODUCT_REVIEWS = /* GraphQL */ `
       }
     }
   }
+`
+
+export const GET_FULL_PRODUCT_DETAILS = /* GraphQL */ `
+query GetFullProductDetails($urlKey: String!) {
+  products(filter: { url_key: { eq: $urlKey } }) {
+    items {
+      __typename
+      id
+      sku
+      name
+      url_key
+      stock_status
+      
+      description {
+        html
+      }
+      short_description {
+        html
+      }
+      
+      media_gallery {
+        url
+        label
+        position
+      }
+      
+      price_range {
+        minimum_price {
+          regular_price {
+            value
+            currency
+          }
+          final_price {
+            value
+            currency
+          }
+          discount {
+            amount_off
+            percent_off
+          }
+        }
+      }
+      custom_attributesV2 {
+        items {
+          code
+          ... on AttributeValue {
+            value
+          }
+          ... on AttributeSelectedOptions {
+            selected_options {
+              label
+              value
+            }
+          }
+        }
+      }
+
+      ... on ConfigurableProduct {
+        configurable_options {
+          attribute_code
+          label
+          values {
+            label
+            value_index
+            swatch_data {
+                ... on ColorSwatchData {
+                  value
+                }
+                ... on TextSwatchData {
+                  value
+                }
+                ... on ImageSwatchData {
+                  thumbnail
+                }
+            }
+          }
+        }
+        variants {
+          attributes {
+            code
+            value_index
+          }
+          product {
+            sku
+            stock_status
+            media_gallery {
+              url
+              label
+              position
+            }
+            price_range {
+              maximum_price {
+                final_price {
+                  value
+                }
+              }
+            }
+          }
+        }
+      }
+
+      related_products {
+        __typename
+        uid
+        sku
+        name
+        url_key
+        url_suffix
+        stock_status
+        thumbnail {
+          url
+          label
+        }
+        price_range {
+          minimum_price {
+            regular_price {
+              value
+              currency
+            }
+            final_price {
+              value
+              currency
+            }
+            discount {
+              amount_off
+              percent_off
+            }
+          }
+        }
+        ... on ConfigurableProduct {
+          configurable_options {
+            attribute_code
+            label
+            values {
+              label
+              value_index
+              swatch_data {
+                  ... on ColorSwatchData {
+                    value
+                  }
+                  ... on TextSwatchData {
+                    value
+                  }
+                  ... on ImageSwatchData {
+                    thumbnail
+                  }
+              }
+            }
+          }
+          variants {
+            attributes {
+              code
+              value_index
+            }
+            product {
+              sku
+              stock_status
+              thumbnail { url }
+              price_range {
+                maximum_price {
+                  final_price {
+                    value
+                    currency
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 `

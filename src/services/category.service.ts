@@ -58,7 +58,11 @@ export async function getCategoryByUrlKey(urlKey: string): Promise<Category | nu
     revalidate: DEFAULT_CACHE_TIME,
   })
 
-  if (errors || !data?.categories?.items?.length) {
+  if (errors) {
+    console.warn('[CategoryService] getCategoryByUrlKey partial errors:', JSON.stringify(errors))
+  }
+
+  if (!data?.categories?.items?.length) {
     return null
   }
 
@@ -75,7 +79,13 @@ export async function getCategoryByUrlPath(urlPath: string): Promise<Category | 
     revalidate: DEFAULT_CACHE_TIME,
   })
 
-  if (errors || !data?.categories?.items?.length) {
+  // Log errors but still return data if available (handles partial responses
+  // where e.g. an optional field is missing in the schema but core data is present)
+  if (errors) {
+    console.warn('[CategoryService] getCategoryByUrlPath partial errors:', JSON.stringify(errors))
+  }
+
+  if (!data?.categories?.items?.length) {
     return null
   }
 
