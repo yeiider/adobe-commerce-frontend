@@ -87,6 +87,56 @@ export const GET_CUSTOMER_WISHLISTS = /* GraphQL */ `
   ${WISHLIST_FRAGMENT}
 `
 
+export const GET_MY_WISHLIST = /* GraphQL */ `
+  query GetMyWishlist {
+    customer {
+      wishlist {
+        id
+        items_count
+        sharing_code
+        items_v2(currentPage: 1, pageSize: 20) {
+          page_info {
+            current_page
+            total_pages
+            page_size
+          }
+          items {
+            id
+            quantity
+            description
+            added_at
+            product {
+              __typename
+              sku
+              name
+              url_key
+              stock_status
+              thumbnail {
+                url
+                label
+              }
+              price_range {
+                minimum_price {
+                  final_price {
+                    value
+                    currency
+                  }
+                }
+              }
+            }
+            ... on ConfigurableWishlistItem {
+              configurable_options {
+                option_label
+                value_label
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const IS_EMAIL_AVAILABLE = /* GraphQL */ `
   query IsEmailAvailable($email: String!) {
     isEmailAvailable(email: $email) {

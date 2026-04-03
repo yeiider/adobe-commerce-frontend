@@ -159,7 +159,6 @@ export interface WishlistItem {
 
 export interface Wishlist {
   id: string
-  name: string
   items_count: number
   sharing_code: string
   updated_at: string

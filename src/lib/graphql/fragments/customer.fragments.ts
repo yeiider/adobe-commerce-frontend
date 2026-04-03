@@ -175,7 +175,6 @@ export const WISHLIST_ITEM_FRAGMENT = /* GraphQL */ `
 export const WISHLIST_FRAGMENT = /* GraphQL */ `
   fragment Wishlist on Wishlist {
     id
-    name
     items_count
     sharing_code
     updated_at

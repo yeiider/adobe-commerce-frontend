@@ -10,6 +10,7 @@
 import { type ReactNode, Suspense } from 'react'
 import { LoadingProvider, type LoadingProviderProps } from './LoadingProvider'
 import { CartQueueProvider } from './CartQueueProvider'
+import { SessionGuard } from './SessionGuard'
 import { Toaster } from '@/components/ui/sonner'
 
 export interface ProvidersProps {
@@ -42,6 +43,7 @@ export function Providers({ children, loaderConfig }: ProvidersProps) {
         <CartQueueProvider>
           {children}
         </CartQueueProvider>
+        <SessionGuard />
         <Toaster />
       </LoadingProvider>
     </Suspense>

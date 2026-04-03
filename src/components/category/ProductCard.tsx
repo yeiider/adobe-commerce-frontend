@@ -6,10 +6,7 @@ import type { Product, ConfigurableProduct } from '@/src/types/product.types'
 import { formatPrice } from '@/src/utils/format'
 import { ProductOptions } from '@/src/components/product/ProductOptions'
 import { LoadingLink } from '@/src/components/common/LoadingLink'
-import { Button } from '@/components/ui/button'
-import { ShoppingCart } from 'lucide-react'
-import { useCartQueue } from '@/src/components/providers/CartQueueProvider'
-import { toast } from 'sonner'
+import { AddToCartButton } from '@/src/components/common/AddToCartButton'
 import Link from 'next/link'
 
 interface ProductCardProps {
@@ -28,8 +25,6 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
   
   const [currentVariant, setCurrentVariant] = useState<any | null>(null)
   
-  const { addToCartQueue, isAdding } = useCartQueue()
-
   const isOutOfStock = stock_status === 'OUT_OF_STOCK'
   const isConfigurable = isConfigurableProduct(product)
   
@@ -119,27 +114,13 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
 
       {/* Acciones */}
       <div className="mt-4 flex gap-2">
-        {product.__typename !== 'SimpleProduct' ? (
-          <Button asChild variant="default" className="w-full h-9">
-            <Link href={productUrl}>
-              {product.__typename === 'ConfigurableProduct' ? 'Ver Opciones' : 'Ver Detalles'}
-            </Link>
-          </Button>
-        ) : (
-          <Button 
-            className="w-full h-9" 
-            variant="default"
-            disabled={isOutOfStock || isAdding}
-            onClick={(e) => {
-              e.preventDefault()
-              if (!product.sku) return
-              addToCartQueue([{ sku: product.sku, quantity: 1 }])
-            }}
-          >
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            {isOutOfStock ? "Agotado" : "Añadir al Carrito"}
-          </Button>
-        )}
+        <AddToCartButton
+          sku={product.sku}
+          currentVariant={currentVariant}
+          isConfigurable={isConfigurable}
+          isOutOfStock={isOutOfStock}
+          className="w-full h-9"
+        />
       </div>
     </article>
   )

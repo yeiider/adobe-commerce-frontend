@@ -56,7 +56,13 @@ export async function createCustomer(input: CustomerCreateInput): Promise<Custom
     cache: 'no-store',
   })
 
-  if (errors || !data?.createCustomerV2?.customer) {
+  if (errors) {
+    console.error('[createCustomer] GraphQL errors:', JSON.stringify(errors, null, 2))
+    return null
+  }
+
+  if (!data?.createCustomerV2?.customer) {
+    console.error('[createCustomer] No customer returned in response:', JSON.stringify(data, null, 2))
     return null
   }
 
@@ -75,7 +81,13 @@ export async function generateCustomerToken(email: string, password: string): Pr
     cache: 'no-store',
   })
 
-  if (errors || !data?.generateCustomerToken?.token) {
+  if (errors) {
+    console.error('[generateCustomerToken] GraphQL errors:', JSON.stringify(errors, null, 2))
+    return null
+  }
+
+  if (!data?.generateCustomerToken?.token) {
+    console.error('[generateCustomerToken] No token returned:', JSON.stringify(data, null, 2))
     return null
   }
 
@@ -365,11 +377,13 @@ export async function getCountryRegions(countryCode: string): Promise<CountryReg
 }
 
 /**
- * Store customer token (client-side helper)
+ * Store customer token in localStorage and cookie (client-side helper)
  */
 export function storeCustomerToken(token: string): void {
   if (typeof window === 'undefined') return
   localStorage.setItem(config.auth.customerTokenKey, token)
+  // Also store in cookie so server-side requests (proxy) can use it
+  document.cookie = `${config.auth.customerTokenKey}=${token}; path=/; SameSite=Strict; max-age=86400`
 }
 
 /**
@@ -381,9 +395,10 @@ export function getStoredCustomerToken(): string | null {
 }
 
 /**
- * Clear stored customer token (client-side helper)
+ * Clear stored customer token from localStorage and cookie (client-side helper)
  */
 export function clearStoredCustomerToken(): void {
   if (typeof window === 'undefined') return
   localStorage.removeItem(config.auth.customerTokenKey)
+  document.cookie = `${config.auth.customerTokenKey}=; path=/; max-age=0`
 }

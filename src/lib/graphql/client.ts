@@ -5,6 +5,17 @@
 
 import { config } from '@/src/config/env'
 
+// Lazy import to avoid issues in client components
+async function getServerCookieToken(): Promise<string | null> {
+  try {
+    const { cookies } = await import('next/headers')
+    const cookieStore = await cookies()
+    return cookieStore.get(config.auth.customerTokenKey)?.value ?? null
+  } catch {
+    return null
+  }
+}
+
 export interface GraphQLResponse<T> {
   data?: T
   errors?: Array<{
@@ -41,6 +52,7 @@ function createHeaders(customHeaders?: Record<string, string>): HeadersInit {
   }
 
   // Add customer token if available (client-side only)
+  // Server-side token is handled per-request in graphqlClient()
   if (typeof window !== 'undefined') {
     const token = localStorage.getItem(config.auth.customerTokenKey)
     if (token) {
@@ -76,9 +88,18 @@ export async function graphqlClient<T>(
 ): Promise<GraphQLResponse<T>> {
   const { query, variables, headers: customHeaders, cache, revalidate, tags } = options
 
+  // On the server, try to read the customer token from the cookie
+  let serverTokenHeader: Record<string, string> = {}
+  if (typeof window === 'undefined') {
+    const cookieToken = await getServerCookieToken()
+    if (cookieToken) {
+      serverTokenHeader = { Authorization: `Bearer ${cookieToken}` }
+    }
+  }
+
   const fetchOptions: RequestInit = {
     method: 'POST',
-    headers: createHeaders(customHeaders),
+    headers: createHeaders({ ...serverTokenHeader, ...customHeaders }),
     body: JSON.stringify({ query, variables }),
   }
 
@@ -118,11 +139,21 @@ export async function graphqlClient<T>(
 
     const json = await response.json()
     console.log('[v0] Response received, has data:', !!json.data, 'has errors:', !!json.errors)
-    
+
     if (json.errors) {
       console.error('[v0] GraphQL Errors:', JSON.stringify(json.errors, null, 2))
+
+      // Detect expired/invalid token on the client side and notify the app
+      if (typeof window !== 'undefined') {
+        const isAuthError = json.errors.some((e: { message: string }) =>
+          /unauthorized|not authorized|invalid token|expired/i.test(e.message)
+        )
+        if (isAuthError) {
+          window.dispatchEvent(new CustomEvent('auth:session-expired'))
+        }
+      }
     }
-    
+
     return json as GraphQLResponse<T>
   } catch (error) {
     console.error('[GraphQL Client Error]:', error)

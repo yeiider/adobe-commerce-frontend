@@ -1,6 +1,6 @@
 /**
  * Wishlist Hook
- * Custom hook for wishlist management with SWR
+ * Manages the customer's default wishlist using the singular customer.wishlist query.
  */
 
 'use client'
@@ -8,7 +8,7 @@
 import useSWR from 'swr'
 import { useCallback } from 'react'
 import { graphqlClient } from '@/src/lib/graphql/client'
-import { getCustomerWishlists } from '@/src/services/customer.service'
+import { GET_MY_WISHLIST } from '@/src/lib/graphql/queries/customer.queries'
 import {
   ADD_PRODUCTS_TO_WISHLIST,
   REMOVE_PRODUCTS_FROM_WISHLIST,
@@ -18,98 +18,147 @@ import { useCustomer } from './use-customer'
 
 const WISHLIST_KEY = 'adobe-commerce-wishlist'
 
+async function fetchMyWishlist(): Promise<Wishlist | null> {
+  const { data, errors } = await graphqlClient<{ customer: { wishlist: Wishlist } }>({
+    query: GET_MY_WISHLIST,
+    cache: 'no-store',
+  })
+
+  if (errors || !data?.customer?.wishlist) {
+    return null
+  }
+
+  return data.customer.wishlist
+}
+
 export function useWishlist() {
   const { isAuthenticated } = useCustomer()
 
-  // Fetch wishlists
   const {
-    data: wishlists,
+    data: wishlist,
     error,
     isLoading,
     mutate,
-  } = useSWR<Wishlist[] | null>(
+  } = useSWR<Wishlist | null>(
     isAuthenticated ? WISHLIST_KEY : null,
-    () => getCustomerWishlists(),
+    fetchMyWishlist,
     {
       revalidateOnFocus: false,
+      shouldRetryOnError: false,
     }
   )
 
-  // Get default wishlist
-  const defaultWishlist = wishlists?.[0] ?? null
+  // Check if a SKU is already in the wishlist
+  const isInWishlist = useCallback(
+    (sku: string) => {
+      if (!wishlist) return false
+      return wishlist.items_v2.items.some((item) => item.product.sku === sku)
+    },
+    [wishlist]
+  )
 
-  // Add product to wishlist
+  // Get the wishlist item ID for a given SKU (needed to remove it)
+  const getWishlistItemId = useCallback(
+    (sku: string): string | undefined => {
+      return wishlist?.items_v2.items.find((item) => item.product.sku === sku)?.id
+    },
+    [wishlist]
+  )
+
+  // Add product to the default wishlist
   const addProduct = useCallback(
     async (sku: string, quantity: number = 1) => {
-      if (!defaultWishlist) return null
+      if (!wishlist) return null
 
       const { data, errors } = await graphqlClient<{
-        addProductsToWishlist: { wishlist: Wishlist }
+        addProductsToWishlist: {
+          wishlist: Wishlist
+          user_errors: { code: string; message: string }[]
+        }
       }>({
         query: ADD_PRODUCTS_TO_WISHLIST,
         variables: {
-          wishlistId: defaultWishlist.id,
+          wishlistId: wishlist.id,
           wishlistItems: [{ sku, quantity }],
         },
         cache: 'no-store',
       })
 
-      if (!errors && data?.addProductsToWishlist?.wishlist) {
-        mutate()
-        return data.addProductsToWishlist.wishlist
+      if (errors) {
+        console.error('[addProduct] GraphQL errors:', errors)
+        return null
+      }
+
+      const userErrors = data?.addProductsToWishlist?.user_errors
+      if (userErrors?.length) {
+        console.error('[addProduct] User errors:', userErrors)
+        return null
+      }
+
+      const updated = data?.addProductsToWishlist?.wishlist
+      if (updated) {
+        mutate(updated, false)
+        return updated
       }
 
       return null
     },
-    [defaultWishlist, mutate]
+    [wishlist, mutate]
   )
 
-  // Remove product from wishlist
+  // Remove a product from the wishlist by its wishlist item ID
   const removeProduct = useCallback(
     async (wishlistItemId: string) => {
-      if (!defaultWishlist) return false
+      if (!wishlist) return false
 
       const { data, errors } = await graphqlClient<{
-        removeProductsFromWishlist: { wishlist: Wishlist }
+        removeProductsFromWishlist: {
+          wishlist: Wishlist
+          user_errors: { code: string; message: string }[]
+        }
       }>({
         query: REMOVE_PRODUCTS_FROM_WISHLIST,
         variables: {
-          wishlistId: defaultWishlist.id,
+          wishlistId: wishlist.id,
           wishlistItemsIds: [wishlistItemId],
         },
         cache: 'no-store',
       })
 
-      if (!errors && data?.removeProductsFromWishlist?.wishlist) {
-        mutate()
+      if (errors) {
+        console.error('[removeProduct] GraphQL errors:', errors)
+        return false
+      }
+
+      const userErrors = data?.removeProductsFromWishlist?.user_errors
+      if (userErrors?.length) {
+        console.error('[removeProduct] User errors:', userErrors)
+        return false
+      }
+
+      const updated = data?.removeProductsFromWishlist?.wishlist
+      if (updated) {
+        mutate(updated, false)
         return true
       }
 
       return false
     },
-    [defaultWishlist, mutate]
-  )
-
-  // Check if product is in wishlist
-  const isInWishlist = useCallback(
-    (sku: string) => {
-      if (!defaultWishlist) return false
-      return defaultWishlist.items_v2.items.some(
-        (item) => item.product.sku === sku
-      )
-    },
-    [defaultWishlist]
+    [wishlist, mutate]
   )
 
   return {
-    wishlists,
-    defaultWishlist,
-    itemCount: defaultWishlist?.items_count ?? 0,
+    wishlist,
+    // Keep wishlists array for backward compat with any existing consumer
+    wishlists: wishlist ? [wishlist] : null,
+    defaultWishlist: wishlist,
+    itemCount: wishlist?.items_count ?? 0,
     isLoading,
     error,
+    isInWishlist,
+    getWishlistItemId,
     addProduct,
     removeProduct,
-    isInWishlist,
     refresh: mutate,
   }
 }

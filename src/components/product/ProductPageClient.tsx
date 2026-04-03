@@ -8,9 +8,11 @@ import { RelatedProductsCarousel } from './RelatedProductsCarousel'
 import { formatPrice } from '@/src/utils/format'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { ShoppingCart, Minus, Plus } from 'lucide-react'
+import { Minus, Plus } from 'lucide-react'
 import { useCartQueue } from '@/src/components/providers/CartQueueProvider'
 import { Input } from '@/components/ui/input'
+import { AddToCartButton } from '@/src/components/common/AddToCartButton'
+import { WishlistButton } from '@/src/components/product/WishlistButton'
 
 interface ProductPageClientProps {
   product: any // Using 'any' for flexibility until strict typing matches the whole dynamic tree
@@ -33,12 +35,7 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
 
   const [currentVariant, setCurrentVariant] = useState<any | null>(null)
   const [quantity, setQuantity] = useState(1)
-  const { addToCartQueue, isAdding } = useCartQueue()
-
-  const handleAddToCart = () => {
-    const skuToUse = currentVariant ? currentVariant.product.sku : sku
-    addToCartQueue([{ sku: skuToUse, quantity }])
-  }
+  const { isAdding } = useCartQueue()
 
   // 1. Image Gallery Logic:
   // Use variant's specific image gallery if it exists, otherwise fallback to the base product's gallery.
@@ -161,15 +158,17 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
               </Button>
             </div>
 
-            <Button 
-              size="lg" 
+            <AddToCartButton
+              sku={sku}
+              currentVariant={currentVariant}
+              isConfigurable={configurable_options?.length > 0}
+              isOutOfStock={isOutOfStock}
+              quantity={quantity}
+              size="lg"
               className="flex-1 h-12 gap-2 text-lg font-semibold uppercase tracking-wider"
-              disabled={isOutOfStock || (configurable_options?.length > 0 && !currentVariant) || isAdding}
-              onClick={handleAddToCart}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              {isOutOfStock ? 'Agotado' : 'Añadir al Carrito'}
-            </Button>
+            />
+
+            <WishlistButton sku={currentVariant?.product?.sku ?? sku} />
           </div>
 
         </div>
