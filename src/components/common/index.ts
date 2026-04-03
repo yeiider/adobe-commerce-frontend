@@ -16,6 +16,10 @@ export { ErrorBoundary } from './ErrorBoundary'
 export { EmptyState } from './EmptyState'
 export { Pagination } from './Pagination'
 
+// Global Loader
+export { GlobalLoader, type GlobalLoaderProps } from './GlobalLoader'
+export { LoadingLink, type LoadingLinkProps } from './LoadingLink'
+
 // SEO components
 export { SEO } from './SEO'
 export { JsonLd } from './JsonLd'
