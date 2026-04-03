@@ -147,10 +147,10 @@ export function FilterSidebar({
   }
 
   return (
-    <aside className={`space-y-6 ${className}`}>
+    <aside className={`space-y-5 ${className}`}>
       {/* Active Filters */}
       {hasActiveFilters && (
-        <div className="space-y-3">
+        <div className="space-y-3 rounded-lg bg-muted/50 p-3">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-foreground">
               Filtros activos
@@ -159,7 +159,7 @@ export function FilterSidebar({
               variant="ghost"
               size="sm"
               onClick={handleClearAll}
-              className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
+              className="h-auto px-2 py-1 text-xs text-primary hover:text-primary/80 hover:bg-primary/10"
             >
               Limpiar todo
             </Button>
@@ -172,18 +172,20 @@ export function FilterSidebar({
       )}
 
       {/* Filter Groups */}
-      <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Filtrar por</h2>
+      <div className="space-y-1">
+        <h2 className="mb-3 text-base font-semibold text-foreground">Filtrar por</h2>
         
-        {displayAggregations.map((aggregation, index) => (
-          <FilterGroup
-            key={aggregation.attribute_code}
-            aggregation={aggregation}
-            isActive={isFilterActive}
-            onToggle={handleFilterToggle}
-            defaultExpanded={displayAggregations.length <= 3 || index === 0}
-          />
-        ))}
+        <div className="divide-y divide-border rounded-lg border border-border overflow-hidden">
+          {displayAggregations.map((aggregation, index) => (
+            <FilterGroup
+              key={aggregation.attribute_code}
+              aggregation={aggregation}
+              isActive={isFilterActive}
+              onToggle={handleFilterToggle}
+              defaultExpanded={displayAggregations.length <= 3 || index === 0}
+            />
+          ))}
+        </div>
       </div>
     </aside>
   )

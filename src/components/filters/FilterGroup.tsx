@@ -62,12 +62,12 @@ export function FilterGroup({
   const isColorFilter = attribute_code === 'color'
 
   return (
-    <div className="border-b border-border pb-4">
+    <div className="bg-background">
       {/* Group Header */}
       <button
         type="button"
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex w-full items-center justify-between py-2 text-left"
+        className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/50"
         aria-expanded={isExpanded}
       >
         <span className="text-sm font-medium text-foreground">{label}</span>
@@ -80,7 +80,7 @@ export function FilterGroup({
 
       {/* Options */}
       {isExpanded && (
-        <div className="mt-2 space-y-1">
+        <div className="px-4 pb-3 space-y-1">
           {isColorFilter ? (
             // Color swatches layout
             <div className="flex flex-wrap gap-2">
@@ -97,7 +97,7 @@ export function FilterGroup({
             </div>
           ) : (
             // Default checkbox layout
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {visibleOptions.map((option) => (
                 <FilterOption
                   key={option.value}
@@ -117,11 +117,11 @@ export function FilterGroup({
               variant="ghost"
               size="sm"
               onClick={() => setShowAll(!showAll)}
-              className="mt-2 h-auto p-0 text-xs text-primary hover:text-primary/80"
+              className="mt-2 h-auto px-2 py-1 text-xs text-primary hover:text-primary/80 hover:bg-primary/10"
             >
               {showAll 
                 ? 'Ver menos' 
-                : `Ver ${hiddenCount} más`
+                : `Ver ${hiddenCount} mas`
               }
             </Button>
           )}
