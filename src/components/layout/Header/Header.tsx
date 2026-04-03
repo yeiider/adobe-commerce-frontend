@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, Search, Heart } from 'lucide-react'
+import { Menu, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { NavigationMenu } from './NavigationMenu'
 import { MobileMenu } from './MobileMenu'
 import { SearchBar } from './SearchBar'
+import { WishlistButton } from './WishlistButton'
 import { config } from '@/src/config/env'
 import type { NavigationItem } from '@/src/types/category.types'
 import { MiniCart } from '@/src/components/cart/index'
@@ -79,13 +80,7 @@ export function Header({ navigation }: HeaderProps) {
             </Button>
 
             {/* Wishlist */}
-            {config.features.enableWishlist && (
-              <Button variant="ghost" size="icon" asChild aria-label="Lista de deseos">
-                <Link href="/wishlist">
-                  <Heart className="h-5 w-5" />
-                </Link>
-              </Button>
-            )}
+            {config.features.enableWishlist && <WishlistButton />}
 
             {/* Account */}
             <AccountButton />

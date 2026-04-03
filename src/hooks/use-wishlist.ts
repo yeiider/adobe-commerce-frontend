@@ -12,6 +12,7 @@ import { getCustomerWishlists } from '@/src/services/customer.service'
 import {
   ADD_PRODUCTS_TO_WISHLIST,
   REMOVE_PRODUCTS_FROM_WISHLIST,
+  ADD_WISHLIST_ITEMS_TO_CART,
 } from '@/src/lib/graphql/mutations/wishlist.mutations'
 import { Wishlist } from '@/src/types/customer.types'
 import { useCustomer } from './use-customer'
@@ -101,6 +102,51 @@ export function useWishlist() {
     [defaultWishlist]
   )
 
+  // Add wishlist items to cart
+  const addItemsToCart = useCallback(
+    async (wishlistItemIds: string[]) => {
+      if (!defaultWishlist) return { success: false, errors: [] }
+
+      const { data, errors } = await graphqlClient<{
+        addWishlistItemsToCart: {
+          status: boolean
+          add_wishlist_items_to_cart_user_errors: Array<{
+            code: string
+            message: string
+          }>
+        }
+      }>({
+        query: ADD_WISHLIST_ITEMS_TO_CART,
+        variables: {
+          wishlistId: defaultWishlist.id,
+          wishlistItemIds,
+        },
+        cache: 'no-store',
+      })
+
+      if (!errors && data?.addWishlistItemsToCart) {
+        return {
+          success: data.addWishlistItemsToCart.status,
+          errors: data.addWishlistItemsToCart.add_wishlist_items_to_cart_user_errors || [],
+        }
+      }
+
+      return { success: false, errors: [] }
+    },
+    [defaultWishlist]
+  )
+
+  // Get wishlist item by SKU
+  const getWishlistItemBySku = useCallback(
+    (sku: string) => {
+      if (!defaultWishlist) return null
+      return defaultWishlist.items_v2.items.find(
+        (item) => item.product.sku === sku
+      ) || null
+    },
+    [defaultWishlist]
+  )
+
   return {
     wishlists,
     defaultWishlist,
@@ -110,6 +156,8 @@ export function useWishlist() {
     addProduct,
     removeProduct,
     isInWishlist,
+    addItemsToCart,
+    getWishlistItemBySku,
     refresh: mutate,
   }
 }
