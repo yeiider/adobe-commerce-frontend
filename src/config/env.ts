@@ -7,7 +7,9 @@ export const config = {
   // Adobe Commerce API Configuration
   adobe: {
     /** GraphQL endpoint URL */
-    graphqlEndpoint: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_GRAPHQL_URL || '',
+    graphqlEndpoint: typeof window !== 'undefined' 
+      ? '/api/graphql' 
+      : (process.env.NEXT_PUBLIC_ADOBE_COMMERCE_GRAPHQL_URL || 'https://magento.goline.com.co/graphql'),
     /** Store code (website level) */
     storeCode: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_STORE_CODE || 'default',
     /** Store view code (determines language, catalog) - sent as "Store" header */

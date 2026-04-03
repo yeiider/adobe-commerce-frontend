@@ -9,6 +9,7 @@ import { MobileMenu } from './MobileMenu'
 import { SearchBar } from './SearchBar'
 import { config } from '@/src/config/env'
 import type { NavigationItem } from '@/src/types/category.types'
+import { MiniCart } from '@/src/components/cart/index'
 
 interface HeaderProps {
   navigation: NavigationItem[] | null
@@ -93,14 +94,7 @@ export function Header({ navigation }: HeaderProps) {
             </Button>
 
             {/* Cart */}
-            <Button variant="ghost" size="icon" className="relative" asChild aria-label="Carrito">
-              <Link href="/checkout/cart">
-                <ShoppingCart className="h-5 w-5" />
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                  0
-                </span>
-              </Link>
-            </Button>
+            <MiniCart />
           </div>
         </div>
 

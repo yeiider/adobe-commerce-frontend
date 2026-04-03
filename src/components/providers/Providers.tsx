@@ -9,6 +9,8 @@
 
 import { type ReactNode, Suspense } from 'react'
 import { LoadingProvider, type LoadingProviderProps } from './LoadingProvider'
+import { CartQueueProvider } from './CartQueueProvider'
+import { Toaster } from '@/components/ui/sonner'
 
 export interface ProvidersProps {
   children: ReactNode
@@ -37,7 +39,10 @@ export function Providers({ children, loaderConfig }: ProvidersProps) {
         detectRouteChanges={true}
         minDisplayTime={300}
       >
-        {children}
+        <CartQueueProvider>
+          {children}
+        </CartQueueProvider>
+        <Toaster />
       </LoadingProvider>
     </Suspense>
   )

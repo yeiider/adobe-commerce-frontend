@@ -8,7 +8,9 @@ import { RelatedProductsCarousel } from './RelatedProductsCarousel'
 import { formatPrice } from '@/src/utils/format'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, Minus, Plus } from 'lucide-react'
+import { useCartQueue } from '@/src/components/providers/CartQueueProvider'
+import { Input } from '@/components/ui/input'
 
 interface ProductPageClientProps {
   product: any // Using 'any' for flexibility until strict typing matches the whole dynamic tree
@@ -30,6 +32,13 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
   } = product
 
   const [currentVariant, setCurrentVariant] = useState<any | null>(null)
+  const [quantity, setQuantity] = useState(1)
+  const { addToCartQueue, isAdding } = useCartQueue()
+
+  const handleAddToCart = () => {
+    const skuToUse = currentVariant ? currentVariant.product.sku : sku
+    addToCartQueue([{ sku: skuToUse, quantity }])
+  }
 
   // 1. Image Gallery Logic:
   // Use variant's specific image gallery if it exists, otherwise fallback to the base product's gallery.
@@ -116,10 +125,47 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
 
           {/* Add to Cart Actions */}
           <div className="mb-12 flex flex-col gap-4 sm:flex-row">
+            <div className="flex h-12 w-32 items-center rounded-md border text-lg shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-full w-10 shrink-0 rounded-none border-r text-muted-foreground hover:text-foreground disabled:opacity-30"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                disabled={isAdding}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <Input
+                type="number"
+                min="1"
+                className="h-full flex-1 rounded-none border-0 text-center text-lg font-semibold hide-arrows focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
+                value={quantity}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value)
+                  if (!isNaN(val) && val > 0) {
+                    setQuantity(val)
+                  } else if (e.target.value === '') {
+                    setQuantity(1)
+                  }
+                }}
+                disabled={isAdding}
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-full w-10 shrink-0 rounded-none border-l text-muted-foreground hover:text-foreground disabled:opacity-30"
+                onClick={() => setQuantity(quantity + 1)}
+                disabled={isAdding}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+
             <Button 
               size="lg" 
-              className="flex-1 gap-2 text-lg font-semibold uppercase tracking-wider"
-              disabled={isOutOfStock || (configurable_options?.length > 0 && !currentVariant)}
+              className="flex-1 h-12 gap-2 text-lg font-semibold uppercase tracking-wider"
+              disabled={isOutOfStock || (configurable_options?.length > 0 && !currentVariant) || isAdding}
+              onClick={handleAddToCart}
             >
               <ShoppingCart className="h-5 w-5" />
               {isOutOfStock ? 'Agotado' : 'Añadir al Carrito'}

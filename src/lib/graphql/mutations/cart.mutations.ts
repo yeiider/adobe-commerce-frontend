@@ -28,14 +28,15 @@ export const CREATE_GUEST_CART = /* GraphQL */ `
 `
 
 export const ADD_PRODUCTS_TO_CART = /* GraphQL */ `
-  mutation AddProductsToCart($cartId: String!, $cartItems: [CartItemInput!]!) {
-    addProductsToCart(cartId: $cartId, cartItems: $cartItems) {
+  mutation AddSimpleProductToCart($cartId: String!, $cartItems: [SimpleProductCartItemInput!]!) {
+    addSimpleProductsToCart(
+      input: {
+        cart_id: $cartId
+        cart_items: $cartItems
+      }
+    ) {
       cart {
         ...Cart
-      }
-      user_errors {
-        code
-        message
       }
     }
   }

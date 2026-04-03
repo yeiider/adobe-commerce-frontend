@@ -88,18 +88,25 @@ export async function getCartItems(cartId: string): Promise<CartItem[] | null> {
 export async function addProductsToCart(
   cartId: string,
   cartItems: CartItemInput[]
-): Promise<AddToCartResponse['addProductsToCart'] | null> {
-  const { data, errors } = await graphqlClient<AddToCartResponse>({
+): Promise<any | null> {
+  const formattedItems = cartItems.map(item => ({
+    data: {
+      sku: item.sku,
+      quantity: item.quantity
+    }
+  }))
+
+  const { data, errors } = await graphqlClient<any>({
     query: ADD_PRODUCTS_TO_CART,
-    variables: { cartId, cartItems },
+    variables: { cartId, cartItems: formattedItems },
     cache: 'no-store',
   })
 
-  if (errors || !data?.addProductsToCart) {
+  if (errors || !data?.addSimpleProductsToCart) {
     return null
   }
 
-  return data.addProductsToCart
+  return data.addSimpleProductsToCart
 }
 
 /**

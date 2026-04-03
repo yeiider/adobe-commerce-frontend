@@ -21,3 +21,4 @@ export {
   type LoadingContextType,
   type LoadingProviderProps,
 } from './LoadingProvider'
+export { CartQueueProvider, useCartQueue } from './CartQueueProvider'
