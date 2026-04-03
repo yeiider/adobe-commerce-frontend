@@ -13,7 +13,7 @@ export const config = {
     /** Store view code (determines language, catalog) - sent as "Store" header */
     storeViewCode: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_STORE_VIEW_CODE || 'default',
     /** Default currency code - sent as "Content-Currency" header */
-    currencyCode: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_CURRENCY_CODE || 'COP',
+    currencyCode: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_CURRENCY_CODE || 'USD',
     /** Locale for formatting (e.g., es_CO, en_US) */
     locale: process.env.NEXT_PUBLIC_ADOBE_COMMERCE_LOCALE || 'es_CO',
     /** Website ID (optional, for multi-website setups) */
