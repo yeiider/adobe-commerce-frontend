@@ -4,13 +4,14 @@ import { useState } from 'react'
 import type { SortFields } from '@/src/types/common.types'
 import { SortBy } from './SortBy'
 import { Button } from '@/components/ui/button'
-import { SlidersHorizontal, Grid, List } from 'lucide-react'
+import { SlidersHorizontal, Grid, List, X } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from '@/components/ui/sheet'
 
 interface ProductToolbarProps {
@@ -51,9 +52,9 @@ export function ProductToolbar({
   const [isFilterOpen, setIsFilterOpen] = useState(false)
 
   return (
-    <div className={`flex flex-wrap items-center justify-between gap-4 ${className}`}>
+    <div className={`flex flex-wrap items-center justify-between gap-3 ${className}`}>
       {/* Left side: Product count & mobile filter toggle */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         {/* Mobile Filter Button */}
         {filterContent && (
           <Sheet open={isFilterOpen} onOpenChange={setIsFilterOpen}>
@@ -61,18 +62,45 @@ export function ProductToolbar({
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="lg:hidden"
+                className="lg:hidden gap-2"
               >
-                <SlidersHorizontal className="mr-2 h-4 w-4" />
-                Filtros
+                <SlidersHorizontal className="h-4 w-4" />
+                <span className="hidden xs:inline">Filtros</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>Filtrar productos</SheetTitle>
+            <SheetContent 
+              side="left" 
+              className="flex w-full flex-col p-0 sm:max-w-[350px]"
+            >
+              <SheetHeader className="flex-row items-center justify-between border-b border-border px-4 py-3">
+                <SheetTitle className="text-base font-semibold">
+                  Filtrar productos
+                </SheetTitle>
               </SheetHeader>
-              <div className="mt-6">
+              
+              {/* Scrollable filter content */}
+              <div className="flex-1 overflow-y-auto px-4 py-4">
                 {filterContent}
+              </div>
+              
+              {/* Fixed footer with action buttons */}
+              <div className="border-t border-border bg-background p-4">
+                <div className="flex gap-3">
+                  <SheetClose asChild>
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                    >
+                      Cerrar
+                    </Button>
+                  </SheetClose>
+                  <Button 
+                    className="flex-1"
+                    onClick={() => setIsFilterOpen(false)}
+                  >
+                    Ver {totalCount} {totalCount === 1 ? 'producto' : 'productos'}
+                  </Button>
+                </div>
               </div>
             </SheetContent>
           </Sheet>
@@ -86,7 +114,7 @@ export function ProductToolbar({
       </div>
 
       {/* Right side: Sort & View Mode */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 sm:gap-4">
         {/* View Mode Toggle */}
         {onViewModeChange && (
           <div className="hidden items-center gap-1 sm:flex">
@@ -95,7 +123,7 @@ export function ProductToolbar({
               size="icon"
               className="h-8 w-8"
               onClick={() => onViewModeChange('grid')}
-              aria-label="Vista de cuadrícula"
+              aria-label="Vista de cuadricula"
             >
               <Grid className="h-4 w-4" />
             </Button>

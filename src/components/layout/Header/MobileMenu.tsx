@@ -8,6 +8,12 @@ import { cn } from '@/lib/utils'
 import { config } from '@/src/config/env'
 import { LoadingLink } from '@/src/components/common/LoadingLink'
 import type { NavigationItem } from '@/src/types/category.types'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet'
 
 interface MobileMenuProps {
   isOpen: boolean
@@ -24,18 +30,6 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
     if (!isOpen) {
       setActiveMenu(null)
       setMenuHistory([])
-    }
-  }, [isOpen])
-
-  // Prevent body scroll when menu is open
-  React.useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
     }
   }, [isOpen])
 
@@ -62,59 +56,44 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
   const currentItems = activeMenu?.children || items || []
 
   return (
-    <>
-      {/* Overlay */}
-      <div
-        className={cn(
-          'fixed inset-0 z-50 bg-black/50 transition-opacity duration-300',
-          isOpen ? 'visible opacity-100' : 'invisible opacity-0'
-        )}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      {/* Menu Panel */}
-      <div
-        className={cn(
-          'fixed inset-y-0 left-0 z-50 flex w-full max-w-xs flex-col bg-background shadow-xl transition-transform duration-300',
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Menú de navegación"
+    <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent 
+        side="left" 
+        className="flex w-[300px] flex-col p-0 sm:w-[350px]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          {activeMenu ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleBack}
-              className="gap-2"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Volver
-            </Button>
-          ) : (
-            <span className="font-semibold">{config.seo.siteName}</span>
-          )}
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Cerrar menú">
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
+        <SheetHeader className="border-b border-border px-4 py-3">
+          <div className="flex items-center justify-between">
+            {activeMenu ? (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBack}
+                className="gap-2 -ml-2"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Volver
+              </Button>
+            ) : (
+              <SheetTitle className="text-base">
+                {config.seo.siteName}
+              </SheetTitle>
+            )}
+          </div>
+        </SheetHeader>
 
         {/* Current Category Title */}
         {activeMenu && (
-          <div className="border-b border-border bg-muted px-4 py-3">
+          <div className="border-b border-border bg-muted/50 px-4 py-3">
             <LoadingLink
               href={activeMenu.url_path ? `/${activeMenu.url_path}` : '#'}
               onClick={onClose}
               loadingMessage={`Cargando ${activeMenu.name}...`}
-              className="text-lg font-semibold text-foreground hover:text-primary"
+              className="text-base font-semibold text-foreground hover:text-primary"
             >
               {activeMenu.name}
             </LoadingLink>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               Ver todos los productos
             </p>
           </div>
@@ -135,46 +114,46 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
         </nav>
 
         {/* Footer Actions */}
-        <div className="border-t border-border p-4">
-          <div className="space-y-2">
+        <div className="mt-auto border-t border-border bg-muted/30 p-4">
+          <nav className="grid grid-cols-2 gap-2">
             <Link
               href="/customer/account"
               onClick={onClose}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+              className="flex flex-col items-center gap-1.5 rounded-lg p-3 text-center text-xs font-medium text-foreground transition-colors hover:bg-accent"
             >
               <User className="h-5 w-5" />
-              Mi Cuenta
+              <span>Mi Cuenta</span>
             </Link>
             {config.features.enableWishlist && (
               <Link
                 href="/wishlist"
                 onClick={onClose}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+                className="flex flex-col items-center gap-1.5 rounded-lg p-3 text-center text-xs font-medium text-foreground transition-colors hover:bg-accent"
               >
                 <Heart className="h-5 w-5" />
-                Lista de Deseos
+                <span>Favoritos</span>
               </Link>
             )}
             <Link
               href="/store-locator"
               onClick={onClose}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+              className="flex flex-col items-center gap-1.5 rounded-lg p-3 text-center text-xs font-medium text-foreground transition-colors hover:bg-accent"
             >
               <MapPin className="h-5 w-5" />
-              Encuentra una Tienda
+              <span>Tiendas</span>
             </Link>
             <Link
               href="/contact"
               onClick={onClose}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+              className="flex flex-col items-center gap-1.5 rounded-lg p-3 text-center text-xs font-medium text-foreground transition-colors hover:bg-accent"
             >
               <Phone className="h-5 w-5" />
-              Contacto
+              <span>Contacto</span>
             </Link>
-          </div>
+          </nav>
         </div>
-      </div>
-    </>
+      </SheetContent>
+    </Sheet>
   )
 }
 
