@@ -32,7 +32,9 @@ function ProductCard({ product }: ProductCardProps) {
   const productUrl = `/${url_key}${url_suffix || ''}`
   
   const price = price_range?.minimum_price
-  const hasDiscount = price?.discount?.percent_off && price.discount.percent_off > 0
+  // Only show discount badge if percent_off is greater than 0
+  const discountPercent = price?.discount?.percent_off ?? 0
+  const hasDiscount = discountPercent > 0
   const isOutOfStock = stock_status === 'OUT_OF_STOCK'
   
   // Get configurable options if product is configurable

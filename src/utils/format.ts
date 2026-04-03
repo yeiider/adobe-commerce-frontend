@@ -28,15 +28,34 @@ function normalizeLocale(locale: string | undefined | null): string {
 export function formatPrice(price: Money | number, currencyCode?: string): string {
   const value = typeof price === 'number' ? price : price.value
   const currency = typeof price === 'number' 
-    ? (currencyCode || config.adobe.currencyCode) 
-    : (currencyCode || price.currency)
+    ? (currencyCode || config.adobe.currencyCode || 'USD') 
+    : (currencyCode || price.currency || 'USD')
   
-  const locale = normalizeLocale(config.adobe.locale)
+  // Normalize locale from es_CO to es-CO format
+  const rawLocale = config.adobe.locale || 'en-US'
+  const locale = rawLocale.replace(/_/g, '-')
 
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency: currency,
-  }).format(value)
+  // Some currencies like COP typically don't show decimals
+  const currenciesWithoutDecimals = ['COP', 'JPY', 'KRW', 'VND']
+  const minimumFractionDigits = currenciesWithoutDecimals.includes(currency) ? 0 : 2
+  const maximumFractionDigits = currenciesWithoutDecimals.includes(currency) ? 0 : 2
+
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits,
+      maximumFractionDigits,
+    }).format(value)
+  } catch {
+    // Fallback to en-US if locale is invalid
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits,
+      maximumFractionDigits,
+    }).format(value)
+  }
 }
 
 /**
