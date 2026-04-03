@@ -46,6 +46,32 @@ export function parseFiltersFromUrl(
 }
 
 /**
+ * Attributes that use range filters (from/to) instead of eq/in
+ */
+const RANGE_FILTER_ATTRIBUTES = ['price']
+
+/**
+ * Parse a range value like "30_40" into {from, to}
+ * Supports formats: "30_40", "30_*", "*_40"
+ */
+function parseRangeValue(value: string): { from?: string; to?: string } | null {
+  const parts = value.split('_')
+  if (parts.length !== 2) return null
+  
+  const [from, to] = parts
+  const result: { from?: string; to?: string } = {}
+  
+  if (from && from !== '*') {
+    result.from = from
+  }
+  if (to && to !== '*') {
+    result.to = to
+  }
+  
+  return Object.keys(result).length > 0 ? result : null
+}
+
+/**
  * Convert filter state to GraphQL filter input
  * 
  * @param filterState - Current filter state
@@ -66,6 +92,16 @@ export function buildGraphQLFilter(
   // Convert filter state to GraphQL format
   Object.entries(filterState).forEach(([attributeCode, values]) => {
     if (!values || (Array.isArray(values) && values.length === 0)) return
+
+    // Handle range filters (like price)
+    if (RANGE_FILTER_ATTRIBUTES.includes(attributeCode)) {
+      const value = Array.isArray(values) ? values[0] : values
+      const rangeValue = parseRangeValue(value)
+      if (rangeValue) {
+        filter[attributeCode] = rangeValue
+      }
+      return
+    }
 
     if (Array.isArray(values)) {
       // Multiple values: use "in" operator
