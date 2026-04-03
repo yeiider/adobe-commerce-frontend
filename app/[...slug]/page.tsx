@@ -107,8 +107,8 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
     notFound()
   }
 
-  // Build GraphQL filter with category ID
-  const graphqlFilter = buildGraphQLFilter(filterState, category.uid)
+  // Build GraphQL filter with category ID (using numeric id for category_id filter)
+  const graphqlFilter = buildGraphQLFilter(filterState, category.id)
 
   // Fetch products with filters
   const products = await getProductsByFilter({
@@ -170,7 +170,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                 <div className="hidden w-64 flex-shrink-0 lg:block">
                   <FilterSidebar 
                     aggregations={products.aggregations}
-                    categoryId={category.uid}
+                    categoryId={category.id}
                   />
                 </div>
               )}
@@ -185,7 +185,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
                     products?.aggregations && products.aggregations.length > 0 ? (
                       <FilterSidebar 
                         aggregations={products.aggregations}
-                        categoryId={category.uid}
+                        categoryId={category.id}
                       />
                     ) : undefined
                   }

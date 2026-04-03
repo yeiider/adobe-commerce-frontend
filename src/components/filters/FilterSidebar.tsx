@@ -11,8 +11,8 @@ import { X } from 'lucide-react'
 interface FilterSidebarProps {
   /** Available aggregations from GraphQL */
   aggregations: Aggregation[]
-  /** Category ID to exclude from filters (already filtered by URL) */
-  categoryId?: string
+  /** Category ID to exclude from filters (already filtered by URL) - numeric ID */
+  categoryId?: string | number
   /** Additional class names */
   className?: string
 }

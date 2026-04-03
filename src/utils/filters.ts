@@ -49,18 +49,18 @@ export function parseFiltersFromUrl(
  * Convert filter state to GraphQL filter input
  * 
  * @param filterState - Current filter state
- * @param categoryId - Optional category ID to include
+ * @param categoryId - Optional category ID to include (numeric ID as string, e.g., "21")
  * @returns GraphQL filter input object
  */
 export function buildGraphQLFilter(
   filterState: FilterState,
-  categoryId?: string
+  categoryId?: string | number
 ): ProductAttributeFilterInput {
   const filter: ProductAttributeFilterInput = {}
 
-  // Add category filter if provided
+  // Add category filter if provided (uses category_id with numeric ID)
   if (categoryId) {
-    filter.category_id = { eq: categoryId }
+    filter.category_id = { eq: String(categoryId) }
   }
 
   // Convert filter state to GraphQL format
