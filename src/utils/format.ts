@@ -8,10 +8,14 @@ import { config } from '@/src/config/env'
 
 /**
  * Format price with currency
+ * @param price - Money object or number value
+ * @param currencyCode - Currency code (required if price is a number)
  */
 export function formatPrice(price: Money | number, currencyCode?: string): string {
   const value = typeof price === 'number' ? price : price.value
-  const currency = typeof price === 'number' ? currencyCode || config.adobe.currencyCode : price.currency
+  const currency = typeof price === 'number' 
+    ? (currencyCode || config.adobe.currencyCode) 
+    : (currencyCode || price.currency)
 
   return new Intl.NumberFormat(config.adobe.locale, {
     style: 'currency',

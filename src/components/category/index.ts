@@ -7,6 +7,10 @@
 export { CategoryCard } from './CategoryCard'
 export { CategoryGrid } from './CategoryGrid'
 export { CategoryBanner } from './CategoryBanner'
+export { CategoryProductList } from './CategoryProductList'
+
+// Breadcrumbs
+export { CategoryBreadcrumbs } from './CategoryBreadcrumbs'
 
 // Navigation
 export { CategoryTree } from './CategoryTree'
