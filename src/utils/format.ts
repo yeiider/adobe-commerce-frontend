@@ -8,9 +8,16 @@ import { config } from '@/src/config/env'
 
 /**
  * Normalize locale format from underscore to hyphen (es_CO -> es-CO)
+ * Falls back to 'en-US' if locale is invalid or empty
  */
-function normalizeLocale(locale: string): string {
-  return locale.replace('_', '-')
+function normalizeLocale(locale: string | undefined | null): string {
+  if (!locale) return 'en-US'
+  const normalized = locale.replace(/_/g, '-')
+  // Validate the locale format (basic check)
+  if (!/^[a-z]{2}(-[A-Z]{2})?$/i.test(normalized)) {
+    return 'en-US'
+  }
+  return normalized
 }
 
 /**

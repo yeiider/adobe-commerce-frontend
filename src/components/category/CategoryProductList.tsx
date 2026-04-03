@@ -1,10 +1,16 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import type { Product } from '@/src/types/product.types'
+import type { Product, ConfigurableProduct, ConfigurableOption } from '@/src/types/product.types'
 import { formatPrice } from '@/src/utils/format'
+import { ConfigurableOptions } from '@/src/components/product/ConfigurableOptions'
 
 interface CategoryProductListProps {
   products: Product[]
+}
+
+// Type guard to check if product is configurable
+function isConfigurableProduct(product: Product): product is ConfigurableProduct {
+  return product.__typename === 'ConfigurableProduct' && 'configurable_options' in product
 }
 
 export function CategoryProductList({ products }: CategoryProductListProps) {
@@ -28,6 +34,11 @@ function ProductCard({ product }: ProductCardProps) {
   const price = price_range?.minimum_price
   const hasDiscount = price?.discount?.percent_off && price.discount.percent_off > 0
   const isOutOfStock = stock_status === 'OUT_OF_STOCK'
+  
+  // Get configurable options if product is configurable
+  const configurableOptions = isConfigurableProduct(product) 
+    ? product.configurable_options 
+    : null
 
   return (
     <article className="group relative flex flex-col">
@@ -85,6 +96,17 @@ function ProductCard({ product }: ProductCardProps) {
           )}
         </div>
       </Link>
+
+      {/* Configurable Options (outside of Link to be interactive) */}
+      {configurableOptions && configurableOptions.length > 0 && (
+        <div className="mt-2">
+          <ConfigurableOptions 
+            options={configurableOptions} 
+            compact={true}
+            maxVisible={5}
+          />
+        </div>
+      )}
     </article>
   )
 }
