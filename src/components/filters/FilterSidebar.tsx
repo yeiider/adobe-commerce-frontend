@@ -175,12 +175,13 @@ export function FilterSidebar({
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-foreground">Filtrar por</h2>
         
-        {displayAggregations.map((aggregation) => (
+        {displayAggregations.map((aggregation, index) => (
           <FilterGroup
             key={aggregation.attribute_code}
             aggregation={aggregation}
             isActive={isFilterActive}
             onToggle={handleFilterToggle}
+            defaultExpanded={displayAggregations.length <= 3 || index === 0}
           />
         ))}
       </div>
