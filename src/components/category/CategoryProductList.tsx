@@ -53,14 +53,14 @@ function ProductCard({ product, priority = false }: ProductCardProps) {
     <article className="group relative flex flex-col">
       <LoadingLink href={productUrl} loadingMessage={`Cargando ${name}...`} className="block">
         {/* Product Image */}
-        <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-muted">
           {thumbnail?.url ? (
             <Image
               src={thumbnail.url}
               alt={thumbnail.label || name}
               fill
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              className="object-contain transition-transform duration-300 group-hover:scale-105"
               priority={priority}
               loading={priority ? 'eager' : 'lazy'}
             />
