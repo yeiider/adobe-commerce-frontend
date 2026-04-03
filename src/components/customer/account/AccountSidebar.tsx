@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { User, Package, MapPin, Settings, LogOut } from 'lucide-react'
+import { User, Package, MapPin, Settings, LogOut, Heart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCustomer } from '@/src/hooks/use-customer'
 import { toast } from 'sonner'
@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 const NAV_ITEMS = [
   { href: '/customer/account', label: 'Mi Cuenta', icon: User, exact: true },
   { href: '/customer/account/orders', label: 'Mis Pedidos', icon: Package, exact: false },
+  { href: '/customer/account/wishlist', label: 'Mis Favoritos', icon: Heart, exact: false },
   { href: '/customer/account/addresses', label: 'Mis Direcciones', icon: MapPin, exact: false },
   { href: '/customer/account/profile', label: 'Editar Perfil', icon: Settings, exact: false },
 ]

@@ -97,61 +97,88 @@ export async function graphqlClient<T>(
     }
   }
 
-  const fetchOptions: RequestInit = {
-    method: 'POST',
-    headers: createHeaders({ ...serverTokenHeader, ...customHeaders }),
-    body: JSON.stringify({ query, variables }),
-  }
-
-  // Handle Next.js caching with tags support
-  if (cache) {
-    fetchOptions.cache = cache
-  }
-
-  // Build next options for ISR with optional tags
-  const nextOptions: { revalidate?: number; tags?: string[] } = {}
-  
-  if (revalidate !== undefined) {
-    nextOptions.revalidate = revalidate
-  }
-  
-  if (tags?.length) {
-    nextOptions.tags = tags
-  }
-  
-  if (Object.keys(nextOptions).length > 0) {
-    fetchOptions.next = nextOptions
-  }
-
   try {
     console.log('[v0] GraphQL Request to:', config.adobe.graphqlEndpoint)
-    console.log('[v0] Headers:', JSON.stringify(createHeaders(customHeaders)))
-    console.log('[v0] Query preview:', query.substring(0, 200))
-    
+    const requestHeaders = createHeaders({ ...serverTokenHeader, ...customHeaders }) as Record<string, string>
+    console.log('[v0] Query preview:', query.substring(0, 100))
+
+    const fetchOptions: RequestInit = {
+      method: 'POST',
+      headers: requestHeaders,
+      body: JSON.stringify({ query, variables }),
+    }
+
+    if (cache) fetchOptions.cache = cache
+
+    const nextOptions: { revalidate?: number; tags?: string[] } = {}
+    if (revalidate !== undefined) nextOptions.revalidate = revalidate
+    if (tags?.length) nextOptions.tags = tags
+    if (Object.keys(nextOptions).length > 0) fetchOptions.next = nextOptions
+
     const response = await fetch(config.adobe.graphqlEndpoint, fetchOptions)
 
-    if (!response.ok) {
-      // Try to get the error body for debugging
-      const errorBody = await response.text()
-      console.error('[v0] HTTP Error Response Body:', errorBody)
+    let json: any
+    let responseText = ''
+    try {
+      responseText = await response.text()
+      // Safely strip BOM if exists
+      if (responseText.charCodeAt(0) === 0xFEFF) {
+        responseText = responseText.slice(1)
+      }
+      
+      // Sometimes Magento wraps the JSON in literal quotes
+      if (responseText.startsWith('"') && responseText.endsWith('"')) {
+        try {
+          responseText = JSON.parse(responseText)
+        } catch {}
+      }
+
+      if (responseText) {
+        json = typeof responseText === 'string' ? JSON.parse(responseText) : responseText
+      }
+    } catch (e) {
+      // Don't throw immediately, we will evaluate if this was an auth error from raw text
+    }
+
+    // Attempt to determine if it is an auth error, either from JSON or raw text
+    let isAuthError = false
+    
+    if (json?.errors) {
+      isAuthError = json.errors.some((e: any) =>
+        e.extensions?.category === 'graphql-authentication' || /unauthorized|not authorized|invalid token|expired/i.test(e.message)
+      )
+    } else if (!response.ok && responseText) {
+      isAuthError = /graphql-authentication|unauthorized|not authorized|invalid token|expired/i.test(responseText)
+    }
+
+    if (isAuthError && requestHeaders['Authorization']) {
+      // Detect expired/invalid token on the client side and notify the app
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:session-expired'))
+      }
+      
+      // Retry the request anonymously
+      console.warn('[v0] Token expired. Retrying request anonymously...')
+      const { Authorization, ...anonymousHeaders } = requestHeaders
+      
+      const retryOptions: RequestInit = {
+        ...fetchOptions,
+        headers: anonymousHeaders
+      }
+      
+      const retryResponse = await fetch(config.adobe.graphqlEndpoint, retryOptions)
+      const retryJson = await retryResponse.json()
+      return retryJson as GraphQLResponse<T>
+    }
+
+    // If it's a real HTTP error and NOT an auth error we could recover from
+    if (!response.ok && (!json || !json.data)) {
+      console.error('[v0] HTTP Error Response Body:', responseText)
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
-    const json = await response.json()
-    console.log('[v0] Response received, has data:', !!json.data, 'has errors:', !!json.errors)
-
-    if (json.errors) {
+    if (json?.errors) {
       console.error('[v0] GraphQL Errors:', JSON.stringify(json.errors, null, 2))
-
-      // Detect expired/invalid token on the client side and notify the app
-      if (typeof window !== 'undefined') {
-        const isAuthError = json.errors.some((e: { message: string }) =>
-          /unauthorized|not authorized|invalid token|expired/i.test(e.message)
-        )
-        if (isAuthError) {
-          window.dispatchEvent(new CustomEvent('auth:session-expired'))
-        }
-      }
     }
 
     return json as GraphQLResponse<T>

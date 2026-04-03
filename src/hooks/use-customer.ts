@@ -30,6 +30,16 @@ export function useCustomer() {
     const token = getStoredCustomerToken()
     setIsAuthenticated(!!token)
     setIsInitializing(false)
+
+    const handleSessionExpired = () => {
+      clearStoredCustomerToken()
+      setIsAuthenticated(false)
+    }
+
+    window.addEventListener('auth:session-expired', handleSessionExpired)
+    return () => {
+      window.removeEventListener('auth:session-expired', handleSessionExpired)
+    }
   }, [])
 
   // Fetch customer data

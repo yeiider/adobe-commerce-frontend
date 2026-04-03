@@ -81,7 +81,7 @@ export function Header({ navigation }: HeaderProps) {
             {/* Wishlist */}
             {config.features.enableWishlist && (
               <Button variant="ghost" size="icon" asChild aria-label="Lista de deseos">
-                <Link href="/wishlist">
+                <Link href="/customer/account/wishlist">
                   <Heart className="h-5 w-5" />
                 </Link>
               </Button>

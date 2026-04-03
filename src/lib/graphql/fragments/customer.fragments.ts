@@ -75,6 +75,12 @@ export const CUSTOMER_ORDER_ITEM_FRAGMENT = /* GraphQL */ `
       }
       label
     }
+    product {
+      thumbnail {
+        url
+        label
+      }
+    }
   }
 `
 
@@ -147,6 +153,7 @@ export const WISHLIST_ITEM_FRAGMENT = /* GraphQL */ `
     description
     added_at
     product {
+      __typename
       uid
       sku
       name
@@ -168,6 +175,41 @@ export const WISHLIST_ITEM_FRAGMENT = /* GraphQL */ `
         }
       }
       stock_status
+      ... on ConfigurableProduct {
+        configurable_options {
+          attribute_id
+          attribute_code
+          label
+          values {
+            value_index
+            label
+            swatch_data {
+              value
+            }
+          }
+        }
+        variants {
+          attributes {
+            code
+            value_index
+          }
+          product {
+            sku
+            stock_status
+            thumbnail {
+              url
+            }
+            price_range {
+              maximum_price {
+                final_price {
+                  value
+                  currency
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 `

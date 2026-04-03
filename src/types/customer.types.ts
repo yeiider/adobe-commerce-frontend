@@ -111,6 +111,12 @@ export interface OrderItem {
   quantity_refunded: number
   status: string
   discounts?: OrderDiscount[]
+  product?: {
+    thumbnail?: {
+      url: string
+      label?: string
+    }
+  }
 }
 
 export interface CustomerOrder {
