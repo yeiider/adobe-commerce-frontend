@@ -4,8 +4,6 @@
  */
 
 export { Providers } from './Providers'
-export { CartProvider, useCartContext } from './CartProvider'
-export { CustomerProvider, useCustomerContext } from './CustomerProvider'
 export { 
   StoreProvider, 
   useStore, 
@@ -15,3 +13,11 @@ export {
   useRootCategoryId,
   type StoreContextType 
 } from './StoreProvider'
+export {
+  LoadingProvider,
+  useGlobalLoading,
+  useIsLoading,
+  useAsyncLoader,
+  type LoadingContextType,
+  type LoadingProviderProps,
+} from './LoadingProvider'

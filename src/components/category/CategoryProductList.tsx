@@ -1,8 +1,10 @@
-import Link from 'next/link'
+'use client'
+
 import Image from 'next/image'
-import type { Product, ConfigurableProduct, ConfigurableOption } from '@/src/types/product.types'
+import type { Product, ConfigurableProduct } from '@/src/types/product.types'
 import { formatPrice } from '@/src/utils/format'
 import { ConfigurableOptions } from '@/src/components/product/ConfigurableOptions'
+import { LoadingLink } from '@/src/components/common/LoadingLink'
 
 interface CategoryProductListProps {
   products: Product[]
@@ -49,7 +51,7 @@ function ProductCard({ product, priority = false }: ProductCardProps) {
 
   return (
     <article className="group relative flex flex-col">
-      <Link href={productUrl} className="block">
+      <LoadingLink href={productUrl} loadingMessage={`Cargando ${name}...`} className="block">
         {/* Product Image */}
         <div className="relative aspect-square overflow-hidden rounded-lg bg-muted">
           {thumbnail?.url ? (
@@ -104,7 +106,7 @@ function ProductCard({ product, priority = false }: ProductCardProps) {
             </div>
           )}
         </div>
-      </Link>
+      </LoadingLink>
 
       {/* Configurable Options (outside of Link to be interactive) */}
       {configurableOptions && configurableOptions.length > 0 && (

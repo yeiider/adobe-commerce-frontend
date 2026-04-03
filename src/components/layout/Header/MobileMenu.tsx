@@ -6,6 +6,7 @@ import { X, ChevronRight, ChevronLeft, User, Heart, MapPin, Phone } from 'lucide
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { config } from '@/src/config/env'
+import { LoadingLink } from '@/src/components/common/LoadingLink'
 import type { NavigationItem } from '@/src/types/category.types'
 
 interface MobileMenuProps {
@@ -105,13 +106,14 @@ export function MobileMenu({ isOpen, onClose, items }: MobileMenuProps) {
         {/* Current Category Title */}
         {activeMenu && (
           <div className="border-b border-border bg-muted px-4 py-3">
-            <Link
+            <LoadingLink
               href={activeMenu.url_path ? `/${activeMenu.url_path}` : '#'}
               onClick={onClose}
+              loadingMessage={`Cargando ${activeMenu.name}...`}
               className="text-lg font-semibold text-foreground hover:text-primary"
             >
               {activeMenu.name}
-            </Link>
+            </LoadingLink>
             <p className="mt-1 text-sm text-muted-foreground">
               Ver todos los productos
             </p>
@@ -201,13 +203,14 @@ function MobileMenuItem({ item, onNavigate, onClose }: MobileMenuItemProps) {
 
   return (
     <li>
-      <Link
+      <LoadingLink
         href={item.url_path ? `/${item.url_path}` : '#'}
         onClick={onClose}
+        loadingMessage={`Cargando ${item.name}...`}
         className="flex items-center px-4 py-3 text-foreground transition-colors hover:bg-accent"
       >
         <span className="font-medium">{item.name}</span>
-      </Link>
+      </LoadingLink>
     </li>
   )
 }

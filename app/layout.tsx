@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, Roboto } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { Providers } from '@/src/components/providers'
 import './globals.css'
 
 const inter = Inter({ 
@@ -70,7 +71,9 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <body className={`${inter.variable} ${roboto.variable} font-sans antialiased`}>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Analytics />
       </body>
     </html>

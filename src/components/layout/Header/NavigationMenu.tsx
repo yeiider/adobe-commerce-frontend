@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import Link from 'next/link'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { LoadingLink } from '@/src/components/common/LoadingLink'
 import type { NavigationItem } from '@/src/types/category.types'
 
 interface NavigationMenuProps {
@@ -58,8 +58,9 @@ function NavItem({ item }: NavItemProps) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Link
+      <LoadingLink
         href={item.url_path ? `/${item.url_path}` : '#'}
+        loadingMessage={`Cargando ${item.name}...`}
         className={cn(
           'flex items-center gap-1 px-4 py-2 text-sm font-medium text-foreground/80 transition-colors hover:text-foreground',
           isOpen && 'text-foreground'
@@ -74,7 +75,7 @@ function NavItem({ item }: NavItemProps) {
             )}
           />
         )}
-      </Link>
+      </LoadingLink>
 
       {/* Dropdown Menu */}
       {hasChildren && (
@@ -96,12 +97,13 @@ function NavItem({ item }: NavItemProps) {
             {/* Ver todos link */}
             {item.url_path && (
               <div className="mt-2 border-t border-border pt-2">
-                <Link
+                <LoadingLink
                   href={`/${item.url_path}`}
+                  loadingMessage={`Cargando ${item.name}...`}
                   className="block px-3 py-2 text-sm font-medium text-primary hover:underline"
                 >
                   Ver todo en {item.name}
-                </Link>
+                </LoadingLink>
               </div>
             )}
           </div>
@@ -125,8 +127,9 @@ function DropdownItem({ item }: DropdownItemProps) {
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
-      <Link
+      <LoadingLink
         href={item.url_path ? `/${item.url_path}` : '#'}
+        loadingMessage={`Cargando ${item.name}...`}
         className={cn(
           'flex items-center justify-between rounded-md px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-accent hover:text-foreground',
           isOpen && 'bg-accent text-foreground'
@@ -134,7 +137,7 @@ function DropdownItem({ item }: DropdownItemProps) {
       >
         <span>{item.name}</span>
         {hasChildren && <ChevronDown className="h-4 w-4 -rotate-90" />}
-      </Link>
+      </LoadingLink>
 
       {/* Nested Dropdown */}
       {hasChildren && (
@@ -150,12 +153,13 @@ function DropdownItem({ item }: DropdownItemProps) {
             <ul className="space-y-1">
               {item.children?.map((child, index) => (
                 <li key={`nested-${child.url_path || child.name}-${index}`}>
-                  <Link
+                  <LoadingLink
                     href={child.url_path ? `/${child.url_path}` : '#'}
+                    loadingMessage={`Cargando ${child.name}...`}
                     className="block rounded-md px-3 py-2 text-sm text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
                   >
                     {child.name}
-                  </Link>
+                  </LoadingLink>
                 </li>
               ))}
             </ul>
