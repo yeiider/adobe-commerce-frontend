@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import {
   Pagination,
   PaginationContent,
@@ -69,11 +68,9 @@ export function CategoryPagination({ currentPage, totalPages, basePath }: Catego
         {/* Previous */}
         <PaginationItem>
           {hasPrevious ? (
-            <Link href={getPageUrl(currentPage - 1)} passHref legacyBehavior>
-              <PaginationPrevious />
-            </Link>
+            <PaginationPrevious href={getPageUrl(currentPage - 1)} />
           ) : (
-            <PaginationPrevious className="pointer-events-none opacity-50" />
+            <PaginationPrevious href="#" className="pointer-events-none opacity-50" aria-disabled="true" />
           )}
         </PaginationItem>
 
@@ -83,11 +80,9 @@ export function CategoryPagination({ currentPage, totalPages, basePath }: Catego
             {page === 'ellipsis' ? (
               <PaginationEllipsis />
             ) : (
-              <Link href={getPageUrl(page)} passHref legacyBehavior>
-                <PaginationLink isActive={page === currentPage}>
-                  {page}
-                </PaginationLink>
-              </Link>
+              <PaginationLink href={getPageUrl(page)} isActive={page === currentPage}>
+                {page}
+              </PaginationLink>
             )}
           </PaginationItem>
         ))}
@@ -95,11 +90,9 @@ export function CategoryPagination({ currentPage, totalPages, basePath }: Catego
         {/* Next */}
         <PaginationItem>
           {hasNext ? (
-            <Link href={getPageUrl(currentPage + 1)} passHref legacyBehavior>
-              <PaginationNext />
-            </Link>
+            <PaginationNext href={getPageUrl(currentPage + 1)} />
           ) : (
-            <PaginationNext className="pointer-events-none opacity-50" />
+            <PaginationNext href="#" className="pointer-events-none opacity-50" aria-disabled="true" />
           )}
         </PaginationItem>
       </PaginationContent>

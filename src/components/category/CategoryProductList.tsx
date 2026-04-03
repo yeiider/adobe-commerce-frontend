@@ -73,12 +73,12 @@ function ProductCard({ product }: ProductCardProps) {
           {price && (
             <div className="flex items-center gap-2">
               <span className="text-sm font-semibold text-foreground">
-                {formatPrice(price.final_price.value, price.final_price.currency)}
+                {formatPrice(price.final_price)}
               </span>
               
               {hasDiscount && (
                 <span className="text-xs text-muted-foreground line-through">
-                  {formatPrice(price.regular_price.value, price.regular_price.currency)}
+                  {formatPrice(price.regular_price)}
                 </span>
               )}
             </div>
