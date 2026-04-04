@@ -3,98 +3,64 @@ import { Header } from '@/src/components/layout/Header'
 import { Footer } from '@/src/components/layout/Footer'
 import { StoreProvider } from '@/src/components/providers/StoreProvider'
 import { getFullStoreContext } from '@/src/services/store.service'
+import { getHomePage } from '@/src/services/storyblok.service'
+import { StoryblokRenderer } from '@/src/components/storyblok/StoryblokRenderer'
 
-// Metadata for SEO
 export const metadata: Metadata = {
   title: 'Magento Store',
   description: 'Tu tienda online con los mejores productos',
 }
 
 export default async function HomePage() {
-  // Get full store context (storeConfig, currency, navigation) - all cached
-  const { storeConfig, currency, navigation } = await getFullStoreContext()
+  const [{ storeConfig, currency, navigation }, homeStory] = await Promise.all([
+    getFullStoreContext(),
+    getHomePage(),
+  ])
 
-  // Use store name from Magento if available
-  const storeName = storeConfig?.store_name || 'Magento Store'
+  // Override metadata with Storyblok SEO fields when available
+  const seoTitle = homeStory?.content?.seo_title
+  const seoDescription = homeStory?.content?.seo_description
+  if (seoTitle) metadata.title = seoTitle
+  if (seoDescription) metadata.description = seoDescription
 
   return (
     <StoreProvider storeConfig={storeConfig} currency={currency}>
       <div className="flex min-h-screen flex-col">
         <Header navigation={navigation} />
-        
+
         <main className="flex-1">
-          <div className="container mx-auto px-4 py-8">
-            {/* Hero Section */}
-            <section className="mb-12 rounded-lg bg-muted p-8 text-center">
-              <h1 className="text-4xl font-bold text-foreground">
-                Bienvenido a {storeName}
-              </h1>
-              <p className="mt-4 text-lg text-muted-foreground">
-                Tu tienda online con los mejores productos
-              </p>
-              {/* Debug: Show currency info */}
-              {currency && (
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Moneda: {currency.default_display_currency_symbol} ({currency.default_display_currency_code})
-                </p>
-              )}
-            </section>
-
-            {/* Featured Categories Placeholder */}
-            <section className="mb-12">
-              <h2 className="mb-6 text-2xl font-semibold text-foreground">
-                Categorías Destacadas
-              </h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="aspect-square rounded-lg bg-muted animate-pulse"
-                  />
-                ))}
-              </div>
-            </section>
-
-            {/* Featured Products Placeholder */}
-            <section className="mb-12">
-              <h2 className="mb-6 text-2xl font-semibold text-foreground">
-                Productos Destacados
-              </h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-                  <div key={i} className="space-y-3">
-                    <div className="aspect-square rounded-lg bg-muted animate-pulse" />
-                    <div className="h-4 w-3/4 rounded bg-muted animate-pulse" />
-                    <div className="h-4 w-1/2 rounded bg-muted animate-pulse" />
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Newsletter Section */}
-            <section className="rounded-lg bg-primary p-8 text-center text-primary-foreground">
-              <h2 className="text-2xl font-semibold">
-                Suscríbete a nuestro Newsletter
-              </h2>
-              <p className="mt-2">
-                Recibe las últimas novedades y ofertas exclusivas
-              </p>
-              <div className="mx-auto mt-6 flex max-w-md gap-2">
-                <input
-                  type="email"
-                  placeholder="Tu correo electrónico"
-                  className="flex-1 rounded-lg border-0 bg-primary-foreground/10 px-4 py-2 text-primary-foreground placeholder:text-primary-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary-foreground/50"
-                />
-                <button className="rounded-lg bg-primary-foreground px-6 py-2 font-medium text-primary transition-colors hover:bg-primary-foreground/90">
-                  Suscribirse
-                </button>
-              </div>
-            </section>
-          </div>
+          {homeStory?.content?.body?.length ? (
+            <StoryblokRenderer blocks={homeStory.content.body} />
+          ) : (
+            <StoryblokFallback storeName={storeConfig?.store_name} />
+          )}
         </main>
-        
+
         <Footer />
       </div>
     </StoreProvider>
+  )
+}
+
+/** Shown while Storyblok home story is not yet configured */
+function StoryblokFallback({ storeName }: { storeName?: string }) {
+  return (
+    <div className="container mx-auto px-4 py-16 text-center">
+      <h1 className="text-4xl font-bold text-foreground">
+        Bienvenido a {storeName ?? 'la tienda'}
+      </h1>
+      <p className="mt-4 text-muted-foreground">
+        Configura el contenido de esta página en{' '}
+        <a
+          href="https://app.storyblok.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary underline hover:no-underline"
+        >
+          Storyblok
+        </a>{' '}
+        creando una historia con slug <code className="rounded bg-muted px-1 font-mono">home</code>.
+      </p>
+    </div>
   )
 }

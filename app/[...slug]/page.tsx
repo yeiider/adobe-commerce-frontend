@@ -15,6 +15,9 @@ import { FilterSidebar, ProductToolbar } from '@/src/components/filters'
 import { parseFiltersFromUrl, buildGraphQLFilter, parseSortParam } from '@/src/utils/filters'
 import { config } from '@/src/config/env'
 import { ProductPageClient } from '@/src/components/product/ProductPageClient'
+import { getStoryBySlug } from '@/src/services/storyblok.service'
+import { StoryblokRenderer } from '@/src/components/storyblok/StoryblokRenderer'
+import type { PageBlok } from '@/src/types/storyblok.types'
 
 interface SlugPageProps {
   params: Promise<{
@@ -113,6 +116,19 @@ export async function generateMetadata({ params }: SlugPageProps): Promise<Metad
         description: descriptionText,
         images: product.media_gallery?.[0]?.url ? [product.media_gallery[0].url] : undefined,
       },
+      robots: { index: true, follow: true },
+    }
+  }
+
+  // 3. Try Storyblok CMS page
+  const story = await getStoryBySlug<PageBlok>(urlPath)
+  if (story) {
+    const seoTitle = story.content?.seo_title
+    const seoDescription = story.content?.seo_description
+    return {
+      title: seoTitle ? { absolute: `${seoTitle} | ${config.seo.siteName}` } : story.name,
+      description: seoDescription || story.name,
+      alternates: { canonical: `${config.seo.siteUrl}/${urlPath}` },
       robots: { index: true, follow: true },
     }
   }
@@ -264,6 +280,23 @@ export default async function SlugPage({ params, searchParams }: SlugPageProps) 
     )
   }
 
-  // 3. Fallback to 404
+  // 3. Try Storyblok CMS page
+  const story = await getStoryBySlug<PageBlok>(urlPath)
+
+  if (story?.content?.body) {
+    return (
+      <StoreProvider storeConfig={storeConfig} currency={currency}>
+        <div className="flex min-h-screen flex-col">
+          <Header navigation={navigation} />
+          <main className="flex-1">
+            <StoryblokRenderer blocks={story.content.body} />
+          </main>
+          <Footer />
+        </div>
+      </StoreProvider>
+    )
+  }
+
+  // 4. Fallback to 404
   notFound()
 }

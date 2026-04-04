@@ -60,6 +60,18 @@ export const config = {
     placeholderUrl: '/images/placeholder.png',
     quality: 80,
   },
+
+  // Storyblok CMS Configuration
+  storyblok: {
+    /** Content Delivery API access token */
+    accessToken: process.env.STORYBLOK_ACCESS_TOKEN || '',
+    /** Space ID */
+    spaceId: process.env.STORYBLOK_SPACE_ID || '',
+    /** "draft" for preview, "published" for production */
+    version: (process.env.STORYBLOK_VERSION || 'published') as 'draft' | 'published',
+    /** Default ISR revalidation time in seconds for Storyblok content */
+    defaultRevalidate: Number(process.env.STORYBLOK_REVALIDATE_TIME) || 3600,
+  },
 } as const
 
 export type Config = typeof config
