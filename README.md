@@ -1,35 +1,76 @@
-# v0-adobe-commerce-frontend
+# Next.js Adobe Commerce / Magento Frontend
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
+A high-performance, advanced frontend for Adobe Commerce (Magento 2) built with Next.js, TypeScript, and Tailwind CSS. This project leverages the Adobe Commerce GraphQL API to provide a seamless, modern e-commerce experience.
 
-## Built with v0
+## Features
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+- **Next.js App Router**: Utilizing the latest React features and Server Components.
+- **Adobe Commerce Integration**: Deep integration with Magento's GraphQL API.
+- **Performance Optimized**: Built for speed with server-side rendering and efficient data fetching.
+- **TypeScript**: Fully typed codebase for better developer experience and stability.
+- **Tailwind CSS**: Modern styling with a utility-first approach.
+- **Flexible Architecture**: Domain-driven design organized for scalability.
 
-[Continue working on v0 →](https://v0.app/chat/projects/prj_adW9W0LjCZwlHrytBAJSMKQ19TsL)
+## Architecture
+
+For a detailed breakdown of the project structure and design patterns, please refer to [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+### Core Structure
+
+- `app/`: Next.js App Router pages and layouts.
+- `src/components/`: React components organized by domain (cart, catalog, checkout, etc.).
+- `src/services/`: Business logic and data fetching layer.
+- `src/lib/graphql/`: GraphQL client, queries, mutations, and fragments.
+- `src/hooks/`: Custom React hooks for client-side state management.
+- `src/types/`: Centralized TypeScript definitions.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- pnpm (recommended) or npm/yarn
+- A running Adobe Commerce (Magento) instance with GraphQL enabled.
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+3. Configure environment variables (see below).
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory and configure the following variables:
+
+```env
+# API
+NEXT_PUBLIC_ADOBE_COMMERCE_GRAPHQL_URL=https://your-magento-store.com/graphql
+
+# Store Configuration
+NEXT_PUBLIC_ADOBE_COMMERCE_STORE_CODE=default
+NEXT_PUBLIC_ADOBE_COMMERCE_STORE_VIEW_CODE=default
+NEXT_PUBLIC_ADOBE_COMMERCE_CURRENCY_CODE=USD
+NEXT_PUBLIC_ADOBE_COMMERCE_LOCALE=en_US
+
+# Media
+NEXT_PUBLIC_ADOBE_COMMERCE_MEDIA_URL=https://your-magento-store.com/media
+```
+
+### Development
+
+Run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-## Learn More
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-To learn more, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-- [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
-
-<a href="https://v0.app/chat/api/kiro/clone/yeiider/v0-adobe-commerce-frontend" alt="Open in Kiro"><img src="https://pdgvvgmkdvyeydso.public.blob.vercel-storage.com/open%20in%20kiro.svg?sanitize=true" /></a>
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.

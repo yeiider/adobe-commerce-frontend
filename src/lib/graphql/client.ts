@@ -98,9 +98,9 @@ export async function graphqlClient<T>(
   }
 
   try {
-    console.log('[v0] GraphQL Request to:', config.adobe.graphqlEndpoint)
+    console.log('[Magento] GraphQL Request to:', config.adobe.graphqlEndpoint)
     const requestHeaders = createHeaders({ ...serverTokenHeader, ...customHeaders }) as Record<string, string>
-    console.log('[v0] Query preview:', query.substring(0, 100))
+    console.log('[Magento] Query preview:', query.substring(0, 100))
 
     const fetchOptions: RequestInit = {
       method: 'POST',
@@ -158,7 +158,7 @@ export async function graphqlClient<T>(
       }
       
       // Retry the request anonymously
-      console.warn('[v0] Token expired. Retrying request anonymously...')
+      console.warn('[Magento] Token expired. Retrying request anonymously...')
       const { Authorization, ...anonymousHeaders } = requestHeaders
       
       const retryOptions: RequestInit = {
@@ -173,12 +173,12 @@ export async function graphqlClient<T>(
 
     // If it's a real HTTP error and NOT an auth error we could recover from
     if (!response.ok && (!json || !json.data)) {
-      console.error('[v0] HTTP Error Response Body:', responseText)
+      console.error('[Magento] HTTP Error Response Body:', responseText)
       throw new Error(`HTTP error! status: ${response.status}`)
     }
 
     if (json?.errors) {
-      console.error('[v0] GraphQL Errors:', JSON.stringify(json.errors, null, 2))
+      console.error('[Magento] GraphQL Errors:', JSON.stringify(json.errors, null, 2))
     }
 
     return json as GraphQLResponse<T>
