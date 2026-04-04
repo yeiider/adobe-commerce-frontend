@@ -59,8 +59,15 @@ export async function generateMetadata({ params }: SlugPageProps): Promise<Metad
     const metaDescription = sanitizeMagentoSeoField(category.meta_description)
     const metaKeywords = sanitizeMagentoSeoField(category.meta_keywords)
 
-    const title = metaTitle || category.name
-    const description = metaDescription || sanitizeMagentoSeoField(category.description) || `Explora los productos de ${category.name} en ${siteName}`
+    // Fallback chain: meta_title → category.name → URL-derived label
+    const urlLabel = urlPath.split('/').pop()?.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'Categoría'
+    const title = metaTitle || category.name || urlLabel
+
+    // Strip HTML tags from category.description before using it as meta description
+    const plainDescription = category.description
+      ? category.description.replace(/<[^>]+>/g, '').trim().slice(0, 160)
+      : null
+    const description = metaDescription || plainDescription || `Explora los productos de ${title} en ${siteName}`
     const canonical = `${siteUrl}/${category.url_path || urlPath}`
 
     return {
@@ -72,9 +79,9 @@ export async function generateMetadata({ params }: SlugPageProps): Promise<Metad
         title,
         description,
         type: 'website',
-        url: `${siteUrl}/${urlPath}`,
+        url: canonical,
         siteName,
-        images: category.image ? [{ url: category.image, width: 1200, height: 630, alt: category.name }] : undefined,
+        images: category.image ? [{ url: category.image, width: 1200, height: 630, alt: title }] : undefined,
       },
       twitter: {
         card: 'summary_large_image',
