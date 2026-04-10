@@ -102,10 +102,29 @@ export async function graphqlClient<T>(
     const requestHeaders = createHeaders({ ...serverTokenHeader, ...customHeaders }) as Record<string, string>
     console.log('[Magento] Query preview:', query.substring(0, 100))
 
+    const isMutation = query.trim().startsWith('mutation')
+    const method = isMutation ? 'POST' : 'GET'
+
     const fetchOptions: RequestInit = {
-      method: 'POST',
+      method,
       headers: requestHeaders,
-      body: JSON.stringify({ query, variables }),
+    }
+
+    let requestUrl = config.adobe.graphqlEndpoint
+
+    if (method === 'GET') {
+      const searchParams = new URLSearchParams()
+      // Remove unnecessary whitespace to keep URL compact
+      const cleanQuery = query.replace(/\s+/g, ' ').trim()
+      searchParams.append('query', cleanQuery)
+      if (variables && Object.keys(variables).length > 0) {
+        searchParams.append('variables', JSON.stringify(variables))
+      }
+      
+      const separator = requestUrl.includes('?') ? '&' : '?'
+      requestUrl = `${requestUrl}${separator}${searchParams.toString()}`
+    } else {
+      fetchOptions.body = JSON.stringify({ query, variables })
     }
 
     if (cache) fetchOptions.cache = cache
@@ -115,7 +134,7 @@ export async function graphqlClient<T>(
     if (tags?.length) nextOptions.tags = tags
     if (Object.keys(nextOptions).length > 0) fetchOptions.next = nextOptions
 
-    const response = await fetch(config.adobe.graphqlEndpoint, fetchOptions)
+    const response = await fetch(requestUrl, fetchOptions)
 
     let json: any
     let responseText = ''
@@ -166,7 +185,7 @@ export async function graphqlClient<T>(
         headers: anonymousHeaders
       }
       
-      const retryResponse = await fetch(config.adobe.graphqlEndpoint, retryOptions)
+      const retryResponse = await fetch(requestUrl, retryOptions)
       const retryJson = await retryResponse.json()
       return retryJson as GraphQLResponse<T>
     }
