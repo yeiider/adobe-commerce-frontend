@@ -129,14 +129,17 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                 className="h-full w-10 shrink-0 rounded-none border-r text-muted-foreground hover:text-foreground disabled:opacity-30"
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 disabled={isAdding}
+                aria-label="Decrease quantity"
               >
-                <Minus className="h-4 w-4" />
+                <Minus className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Input
+                id="quantity-input"
                 type="number"
                 min="1"
-                className="h-full flex-1 rounded-none border-0 text-center text-lg font-semibold hide-arrows focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
+                className="h-full flex-1 rounded-none border-0 px-0 text-center text-lg font-semibold hide-arrows focus-visible:ring-0 focus-visible:ring-offset-0"
                 value={quantity}
+                aria-label="Quantity"
                 onChange={(e) => {
                   const val = parseInt(e.target.value)
                   if (!isNaN(val) && val > 0) {
@@ -153,8 +156,9 @@ export function ProductPageClient({ product }: ProductPageClientProps) {
                 className="h-full w-10 shrink-0 rounded-none border-l text-muted-foreground hover:text-foreground disabled:opacity-30"
                 onClick={() => setQuantity(quantity + 1)}
                 disabled={isAdding}
+                aria-label="Increase quantity"
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
 

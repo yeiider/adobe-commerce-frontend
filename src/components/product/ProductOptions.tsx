@@ -129,6 +129,7 @@ export function ProductOptions({ options, variants, onVariantChange, compact = f
                     key={val.value_index}
                     type="button"
                     title={val.label}
+                    aria-label={val.label}
                     disabled={!available}
                     onClick={() => handleSelect(option.attribute_code, val.value_index)}
                     className={cn(
@@ -149,6 +150,7 @@ export function ProductOptions({ options, variants, onVariantChange, compact = f
                     key={val.value_index}
                     type="button"
                     title={val.label}
+                    aria-label={val.label}
                     disabled={!available}
                     onClick={() => handleSelect(option.attribute_code, val.value_index)}
                     className={cn(
@@ -158,7 +160,7 @@ export function ProductOptions({ options, variants, onVariantChange, compact = f
                       !available && "opacity-30 cursor-not-allowed"
                     )}
                   >
-                    <Image src={swatch.thumbnail} fill alt={val.label} className="object-cover" />
+                    <Image src={swatch.thumbnail} fill sizes="48px" alt={val.label} className="object-cover" />
                   </button>
                 )
               }

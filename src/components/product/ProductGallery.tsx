@@ -35,13 +35,14 @@ export function ProductGallery({ mediaGallery, name }: ProductGalleryProps) {
       {/* Main Active Image */}
       <div className="relative overflow-hidden rounded-lg bg-white border">
         <AspectRatio ratio={1}>
-          <Image
-            src={activeImage?.url || mediaGallery[0].url}
-            alt={activeImage?.label || name}
-            fill
-            className="object-contain p-4 transition-all duration-500 hover:scale-105"
-            priority
-          />
+            <Image
+              src={activeImage?.url || mediaGallery[0].url}
+              alt={activeImage?.label || name}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-contain p-4 transition-all duration-500 hover:scale-105"
+              priority
+            />
         </AspectRatio>
       </div>
 
@@ -71,6 +72,7 @@ export function ProductGallery({ mediaGallery, name }: ProductGalleryProps) {
                     src={media.url}
                     alt={media.label || `${name} view ${index + 1}`}
                     fill
+                    sizes="100px"
                     className="object-cover"
                   />
                 </button>
