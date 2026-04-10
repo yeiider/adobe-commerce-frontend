@@ -105,18 +105,20 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
         <form onSubmit={handleSubmit}>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              ref={inputRef}
-              type="search"
-              placeholder="Buscar productos..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => query.length >= MIN_CHARS && setShowSuggestions(true)}
-              className="h-12 pl-10 pr-24"
-              aria-label="Buscar productos"
-              aria-expanded={showSuggestions}
-              aria-autocomplete="list"
-            />
+              <Input
+                ref={inputRef}
+                type="search"
+                placeholder="Buscar productos..."
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => query.length >= MIN_CHARS && setShowSuggestions(true)}
+                className="h-12 pl-10 pr-24"
+                aria-label="Buscar productos"
+                role="combobox"
+                aria-expanded={showSuggestions}
+                aria-autocomplete="list"
+                aria-controls="search-suggestions"
+              />
             <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-2">
               {query && (
                 <Button
@@ -147,17 +149,19 @@ export function SearchBar({ isOpen, onClose }: SearchBarProps) {
 
         {/* Live suggestions dropdown */}
         {showSuggestions && (
-          <SearchSuggestions
-            query={debouncedQuery || query}
-            suggestions={suggestionsData?.suggestions ?? []}
-            products={suggestionsData?.products ?? []}
-            isLoading={suggestionsLoading}
-            onSelectTerm={handleSelectTerm}
-            onClose={() => {
-              setShowSuggestions(false)
-              onClose()
-            }}
-          />
+          <div id="search-suggestions">
+            <SearchSuggestions
+              query={debouncedQuery || query}
+              suggestions={suggestionsData?.suggestions ?? []}
+              products={suggestionsData?.products ?? []}
+              isLoading={suggestionsLoading}
+              onSelectTerm={handleSelectTerm}
+              onClose={() => {
+                setShowSuggestions(false)
+                onClose()
+              }}
+            />
+          </div>
         )}
       </div>
     </div>
